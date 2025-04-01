@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* chrome, safari, edge, opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* track */
+::-webkit-scrollbar-track {
+  background-color: #d7d7d7f5;
+}
+
+/* handle */
+::-webkit-scrollbar-thumb {
+  background: #3a97ef;
+  transition: all 10.3s ease;
+}
+
+/* handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  transition: all 10.3s ease;
+  background-color: #035cd1da;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  /* box-sizing: border-box; */
+  margin: 0;
+  padding: 0;
+}
+
+.hero_animation {
+  background: linear-gradient(
+    148.44deg,
+    hsla(213, 76%, 53%, 0.45),
+    10.41%,
+    hsla(0, 0%, 100%, 0) 89.25%
+  );
+  animation: changeBackgroundColor 8s infinite alternate;
+}
+
+@keyframes changeBackgroundColor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  16.67% {
+    opacity: 0.9;
+  }
+  33.33% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  66.67% {
+    opacity: 0.5;
+  }
+  83.33% {
+    opacity: 0.4;
+  }
+}
+
+.shake {
+  animation: shake 1s ease-in-out;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.staffWhite {
+  background-image: url("../public//assets//staffWhite.png");
+}
