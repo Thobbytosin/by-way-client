@@ -133,9 +133,15 @@ _A modern and interactive e-learning platform_
 
 ## 📸 Screenshots
 
-![Home](https://github.com/user-attachments/assets/d36c764b-79f0-484f-9b5c-29274b7de3f1)
-![Details](https://github.com/user-attachments/assets/89a6abf3-8b40-4b3e-aca7-1d869f82dda4)
-![Search](https://github.com/user-attachments/assets/7adcca53-eafe-4f5d-a59f-7a62c43ac179)
+![Home]![image](https://github.com/user-attachments/assets/d3f0d549-7702-4375-bcec-2c32eaecd935)
+
+![About]![image](https://github.com/user-attachments/assets/d9a6d847-4acb-4ec7-87d8-727af40b02b8)
+
+![Course Details]![image](https://github.com/user-attachments/assets/f529fc34-cf21-4d69-958e-df68dfc08321)
+
+![Course Content]![image]![image](https://github.com/user-attachments/assets/584c5f15-20cf-4fed-ab1f-88a19a88b571)
+
+
 
 ## 🎲 Contributing
 
