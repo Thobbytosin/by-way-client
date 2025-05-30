@@ -35,9 +35,7 @@ export const courseApi = apiSlice.injectEndpoints({
           const result = await queryFulfilled;
 
           // console.log("ALL COURSES GOTTEN SUCCESSFULLY");
-        } catch (error: any) {
-          // console.log("ERROR GETTING ALL COURSES:", error);
-        }
+        } catch (error: any) {}
       },
     }),
 
