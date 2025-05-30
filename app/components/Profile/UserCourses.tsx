@@ -6,8 +6,6 @@ type Props = {
 };
 
 const UserCourses: FC<Props> = ({ user }) => {
-  // console.log(user);
-
   return (
     <div className="sm:p-8 p-4">
       <h1 className=" text-2xl sm:text-start text-center font-semibold">

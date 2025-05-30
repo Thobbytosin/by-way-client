@@ -23,9 +23,9 @@ export const orderApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("STRIPE PUBLISHABLE KEY");
+          // console.log("STRIPE PUBLISHABLE KEY");
         } catch (error: any) {
-          console.log("ERROR FETCHING STRIPE PUBLISHABLE KEY", error);
+          // console.log("ERROR FETCHING STRIPE PUBLISHABLE KEY", error);
         }
       },
     }),
@@ -43,9 +43,9 @@ export const orderApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("STRIPE PAYMENT INTENT");
+          // console.log("STRIPE PAYMENT INTENT");
         } catch (error: any) {
-          console.log("ERROR CREATING STRIPE PAYMENT INTENT", error);
+          // console.log("ERROR CREATING STRIPE PAYMENT INTENT", error);
         }
       },
     }),

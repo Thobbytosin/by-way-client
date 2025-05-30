@@ -53,8 +53,6 @@ const Analytics = (props: Props) => {
 
   const minValue = 0;
 
-  console.log(analyticsData);
-
   return (
     <div className=" w-full h-screen rounded-lg bg-white dark:bg-[#0B1739] mt-10 flex items-start">
       {/* left */}

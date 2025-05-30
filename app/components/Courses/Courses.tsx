@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import SearchBar from "../../utils/SearchBar";
 import React, { FC, useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
@@ -38,32 +39,15 @@ const Courses: FC<Props> = ({ search }) => {
       "",
       `${window.location.pathname}?${params.toString()}`
     );
-
-    // Update local state to reflect the change
-    // setSearch(newSearchValue);
   };
-
-  // console.log(updateSearchParam("design"));
 
   useEffect(() => {
     coursesRefetch();
 
-    // if (category === "All") {
-    //   setCourses(coursesData?.courses);
-    // } else {
-    //   const filteredCourses = coursesData?.courses.filter(
-    //     (item: any) =>
-    //       item.category === category ||
-    //       item.name.toLowerCase().includes(search.toLowerCase())
-    //   );
-    //   setCourses(filteredCourses);
-    // }
-
     // filter all
     if (category === "All") {
-      //   console.log("true");
       setCourses(coursesData?.courses);
-      // console.log("YES ALL");
+
       return;
     }
 
@@ -78,8 +62,6 @@ const Courses: FC<Props> = ({ search }) => {
         )
       );
 
-      // console.log("YES CATEGORY");
-
       return;
     }
 
@@ -92,20 +74,9 @@ const Courses: FC<Props> = ({ search }) => {
             item.category.toLowerCase().includes(searchText?.toLowerCase())
         )
       );
-      // console.log("YES SEARCH AND YES SEARCH TEXT");
       return;
     }
 
-    // filter from header search bar
-    // if (search && searchText === "") {
-    //   // setCourses(
-    //   //   coursesData?.courses?.filter(
-    //   //     (item: any) =>
-    //   //       item.name.toLowerCase().includes(search.toLowerCase()) ||
-    //   //       item.category.toLowerCase().includes(search.toLowerCase())
-    //   //   )
-    //   // );
-    //   console.log("YES SEARCH BUT NO SEARCH TEXT");
     // }
   }, [coursesData, category, search, searchText]);
 
@@ -122,13 +93,6 @@ const Courses: FC<Props> = ({ search }) => {
       handleSearch();
     }
   };
-
-  //   console.log(categoriesData);
-  //   console.log(coursesData);
-  // console.log("COURSES:", courses);
-  // console.log("ACTIVE SEARCH:", search);
-  // console.log("ACTIVE SEARCH TERM:", searchText);
-  // console.log("ACTIVE CATEGORY:", category);
 
   return (
     <div className="min-h-screen">

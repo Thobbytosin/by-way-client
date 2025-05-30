@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { FC, useState, useEffect } from "react";
 import CourseClassContent from "./CourseClassContent";
 import CourseClassContentList from "./CourseClassContentList";
@@ -106,17 +107,6 @@ const CourseClass: FC<Props> = ({ courseId }) => {
   useEffect(() => {
     refetch();
   }, [activeVideo, activeTag]);
-
-  // console.log(activeVideo);
-  // console.log(savedIndex);
-  // console.log("/////////////////////////////////");
-  // console.log(savedLastVisibleSection);
-  // console.log(data?.content[0]?.videoSection);
-  // console.log(visibleSection);
-  // console.log(user);
-  // console.log(adminData);
-  // console.log(savedProgress);
-  // console.log(progressCounter);
 
   return (
     <div>

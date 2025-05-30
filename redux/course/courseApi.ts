@@ -34,9 +34,9 @@ export const courseApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("ALL COURSES GOTTEN SUCCESSFULLY");
+          // console.log("ALL COURSES GOTTEN SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR GETTING ALL COURSES:", error);
+          // console.log("ERROR GETTING ALL COURSES:", error);
         }
       },
     }),
@@ -53,9 +53,9 @@ export const courseApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("ALL COURSES GOTTEN SUCCESSFULLY");
+          // console.log("ALL COURSES GOTTEN SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR GETTING ALL COURSES:", error);
+          // console.log("ERROR GETTING ALL COURSES:", error);
         }
       },
     }),
@@ -72,9 +72,9 @@ export const courseApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("COURSE DELETED");
+          // console.log("COURSE DELETED");
         } catch (error: any) {
-          console.log("ERROR DELETING COURSE", error);
+          // console.log("ERROR DELETING COURSE", error);
         }
       },
     }),
@@ -92,9 +92,9 @@ export const courseApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("COURSE EDITED");
+          // console.log("COURSE EDITED");
         } catch (error: any) {
-          console.log("ERROR EDITING COURSE", error);
+          // console.log("ERROR EDITING COURSE", error);
         }
       },
     }),
@@ -111,9 +111,9 @@ export const courseApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("COURSE DETAILS FETCHED");
+          // console.log("COURSE DETAILS FETCHED");
         } catch (error: any) {
-          console.log("ERROR FETCHING COURSE DETAILS", error);
+          // console.log("ERROR FETCHING COURSE DETAILS", error);
         }
       },
     }),

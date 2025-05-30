@@ -16,9 +16,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("USER PROFILE PICTURE UPLOADED SUCCESSFULLY");
+          // console.log("USER PROFILE PICTURE UPLOADED SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR GETTING USER PROFILE PICTURE:", error);
+          // console.log("ERROR GETTING USER PROFILE PICTURE:", error);
         }
       },
     }),
@@ -36,9 +36,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("USER INFO UPDATED SUCCESSFULLY");
+          // console.log("USER INFO UPDATED SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR UPDATING USER INFO:", error);
+          // console.log("ERROR UPDATING USER INFO:", error);
         }
       },
     }),
@@ -56,9 +56,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("USER INFO PASSWORD:");
+          // console.log("USER INFO PASSWORD:");
         } catch (error: any) {
-          console.log("ERROR UPDATING USER INFO:", error);
+          // console.log("ERROR UPDATING USER INFO:", error);
         }
       },
     }),
@@ -75,9 +75,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("ALL USERS GOTTEN SUCCESSFULLY");
+          // console.log("ALL USERS GOTTEN SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR FETCHING ALL USERS:", error);
+          // console.log("ERROR FETCHING ALL USERS:", error);
         }
       },
     }),
@@ -104,9 +104,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("USER ROLE UPDATED SUCCESSFULLY");
+          // console.log("USER ROLE UPDATED SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR UPDATING USER ROLE:", error);
+          // console.log("ERROR UPDATING USER ROLE:", error);
         }
       },
     }),
@@ -123,9 +123,9 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          // console.log("USER ACCOUNT DELETED");
+          console.log("USER ACCOUNT DELETED");
         } catch (error: any) {
-          // console.log("ERROR DELETING USER ACCOUNT", error);
+          console.log("ERROR DELETING USER ACCOUNT", error);
         }
       },
     }),

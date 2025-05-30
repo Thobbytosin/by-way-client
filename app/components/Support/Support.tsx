@@ -37,9 +37,6 @@ const Support = (props: Props) => {
     setActiveQuestionId((prev) => (prev === id ? null : id));
   };
 
-  // console.log(data?.layout?.faq);
-  // console.log(faqs);
-
   return (
     <>
       <div

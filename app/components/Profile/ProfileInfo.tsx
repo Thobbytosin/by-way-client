@@ -72,7 +72,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
 
       await updateAvatar(form);
     } else {
-      return console.log("ERROR UPLOADING FILE TO SERVER");
+      return toast.error("ERROR UPLOADING FILE TO SERVER");
     }
   };
 
@@ -91,7 +91,6 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
         // await register(dataToSubmit);
         await updateUserInfo(dataToSubmit);
       } catch (error: any) {
-        console.log(error);
       } finally {
         setSubmitting(false);
       }

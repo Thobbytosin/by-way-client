@@ -88,9 +88,6 @@ const CourseClassContentList: FC<Props> = ({
   const contentTotalDuration = (duration: number) => {
     const hours = Math.floor(duration / 3600);
     const minutes = Math.ceil((duration % 3600) / 60);
-    // const remainingSeconds = duration / 60;
-
-    // console.log(remainingSeconds);
 
     // Return formatted time
     return `${
@@ -124,13 +121,6 @@ const CourseClassContentList: FC<Props> = ({
 
   // set active content video
   active = data[activeVideo];
-  // console.log(visibleSection);
-  // console.log(active);
-  // console.log(data);
-  // console.log(savedLastVisibleSection);
-  // console.log(`"${active.videoSection}"`);
-  // console.log(activeVideo);
-  // console.log(data[activeVideo]);
 
   return (
     <>

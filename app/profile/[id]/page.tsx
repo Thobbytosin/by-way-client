@@ -16,8 +16,6 @@ const Page = (props: Props) => {
   const { user } = useSelector((state: any) => state.auth);
   const { refetch } = useRefreshTokenQuery(undefined, { skip: false });
 
-  // console.log(user);
-
   // refresh token when page loads
   useEffect(() => {
     refetch();

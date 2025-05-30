@@ -23,8 +23,6 @@ export const formatSameContentTime = (course: any) => {
   const minutes = Math.ceil((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  // console.log(hours, typeof hours);
-
   // Return formatted time
   return `${
     hours >= 1 ? `${hours}.${minutes} Total hours` : `${minutes} minutes`

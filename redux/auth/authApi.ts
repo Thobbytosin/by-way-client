@@ -26,9 +26,9 @@ export const authApi = apiSlice.injectEndpoints({
           const result = await queryFulfilled;
 
           dispatch(userRegisration({ token: result.data.activationToken }));
-          console.log("USER REGISTRATION SUCCESSFUL");
+          // console.log("USER REGISTRATION SUCCESSFUL");
         } catch (error: any) {
-          console.log("ERROR REGISTERING USER", error);
+          // console.log("ERROR REGISTERING USER", error);
         }
       },
     }),
@@ -88,9 +88,9 @@ export const authApi = apiSlice.injectEndpoints({
               user: result.data.user,
             })
           );
-          console.log("LOGGED IN WITH SOCIAL AUTH SUCCESSFUL");
+          // console.log("LOGGED IN WITH SOCIAL AUTH SUCCESSFUL");
         } catch (error: any) {
-          console.log("ERROR LOGGING IN WITH SOCIAL AUTH", error);
+          // console.log("ERROR LOGGING IN WITH SOCIAL AUTH", error);
         }
       },
     }),
@@ -114,9 +114,9 @@ export const authApi = apiSlice.injectEndpoints({
               user: "",
             })
           );
-          console.log("LOGOUT SUCCESSFULLY");
+          // console.log("LOGOUT SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR LOGGING OUT", error);
+          // console.log("ERROR LOGGING OUT", error);
         }
       },
     }),

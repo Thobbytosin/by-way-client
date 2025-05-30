@@ -68,7 +68,7 @@ const CourseInformation: FC<Props> = ({
     return () => URL.revokeObjectURL(videoUrl);
   };
 
-  console.log(courseInfo);
+  // console.log(courseInfo);
 
   useEffect(() => {
     if (data) {

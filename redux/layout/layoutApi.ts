@@ -24,9 +24,9 @@ export const layoutApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          console.log("LAYOUT EDITED SUCCESSFULLY");
+          // console.log("LAYOUT EDITED SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR EDITING LAYOUT:", error);
+          // console.log("ERROR EDITING LAYOUT:", error);
         }
       },
     }),

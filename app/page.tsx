@@ -31,8 +31,6 @@ const Page: FC<Props> = (props) => {
     refetch,
   } = useGetAllCoursesWithoutPurchaseQuery({});
 
-  // console.log(coursesData);
-
   // get banner
   const {
     data: heroData,
@@ -89,16 +87,12 @@ const Page: FC<Props> = (props) => {
     };
   };
 
-  // console.log(usersData);
-
   // create new all courses reviews array
   const allReviews = Array.from(
     new Set(coursesData?.courses?.map((item: any) => item.reviews))
   );
 
   const updatedReviews = allReviews.flatMap((item: any) => item);
-
-  // console.log(updatedReviews);
 
   return (
     <div>

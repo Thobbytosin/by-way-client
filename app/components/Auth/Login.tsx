@@ -48,9 +48,6 @@ const Login = (props: Props) => {
     useSocialAuthMutation();
   const [logout, setLogout] = useState(false);
   const {} = useLogoutQuery(undefined, { skip: logout ? false : true });
-  // const { refetch } = useLoadUserQuery({});
-  // console.log(user);
-  // console.log(data);
 
   useEffect(() => {
     setIsClient(true);
@@ -113,7 +110,6 @@ const Login = (props: Props) => {
       try {
         await login(data);
       } catch (error: any) {
-        console.log(error);
       } finally {
         setSubmitting(false);
       }

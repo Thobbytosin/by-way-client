@@ -31,12 +31,12 @@ const initializeApp = async () => {
         apiSlice.endpoints.loadUser.initiate({}, { forceRefetch: true })
       );
     } catch (error) {
-      console.error("Error loading user:", error);
+      // console.error("Error loading user:", error);
       // Handle error, perhaps set user to default values or notify user
     }
   } else {
     // Provide default data or skip fetching user data during build
-    console.log("Skipping user data fetch during build");
+    // console.log("Skipping user data fetch during build");
     // You might want to set some default state here if necessary
   }
 };

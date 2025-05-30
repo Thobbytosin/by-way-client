@@ -19,9 +19,9 @@ export const apiSlice = createApi({
         try {
           const result = await queryFulfilled;
 
-          console.log("REFRESHED SUCCESSFULLY");
+          // console.log("REFRESHED SUCCESSFULLY");
         } catch (error: any) {
-          console.log("ERROR REFRESHING:", error);
+          // console.log("ERROR REFRESHING:", error);
         }
       },
     }),
@@ -39,9 +39,9 @@ export const apiSlice = createApi({
 
           dispatch(getUser({ user: result.data.user }));
 
-          console.log("USER DATA GOTTEN:");
+          // console.log("USER DATA GOTTEN:");
         } catch (error: any) {
-          console.log("ERROR GETTING USER:", error);
+          // console.log("ERROR GETTING USER:", error);
         }
       },
     }),

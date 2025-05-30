@@ -62,8 +62,6 @@ const CoursePreview: FC<Props> = ({
     handleCourseEdit();
   };
 
-  console.log(courseData);
-
   return (
     <div className=" mt-[6rem] w-[80%]">
       <div className=" w-full relative">

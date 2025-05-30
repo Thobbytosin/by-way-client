@@ -65,7 +65,6 @@ const ChangePassword = (props: Props) => {
 
         await updateUserPassword(dataToSubmit);
       } catch (error: any) {
-        console.log(error);
       } finally {
         setSubmitting(false);
       }

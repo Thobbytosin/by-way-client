@@ -188,13 +188,6 @@ const EditCourse: FC<Props> = ({ id }) => {
     await updateCourse(data);
   };
 
-  // console.log("COURSE INFO:", courseInfo);
-  // console.log("COURSE BENEFITS", benefits);
-  // console.log("COURSE PREREQUISITES", prerequisties);
-  // console.log("COURSE CONTENT DATA", courseContentData);
-  // console.log("COURSE DATA", courseData);
-  // console.log(editCourseData);
-
   return (
     <div className=" w-full relative  p-10 min-h-full">
       {/* Course options */}

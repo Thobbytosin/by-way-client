@@ -114,19 +114,14 @@ const Register = (props: Props) => {
 
         await register(dataToSubmit);
       } catch (error: any) {
-        console.log(error);
       } finally {
         setSubmitting(false);
       }
     },
   });
 
-  // console.log(token);
-
   const { errors, touched, values, handleChange, handleSubmit, isSubmitting } =
     formik;
-
-  // console.log(/\d/.test(values.password)); check if string contains a number
 
   return (
     <>

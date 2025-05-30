@@ -104,31 +104,6 @@ const CourseClassContent: FC<Props> = ({
     reviewId: reviewId,
   };
 
-  // const activeCourseFromUsersCourses = user?.courses?.find(
-  //   (c: any) => c.courseId === courseId
-  // );
-  // const notViewedVideo = activeCourseFromUsersCourses?.progress?.find(
-  //   (v: any) => v.viewed === false
-  // );
-  // const findUserViewedVideo = activeCourseFromUsersCourses?.progress?.filter(
-  //   (v: any) => v.viewed === true
-  // );
-
-  // const activeLastNotViewedVideoIndex = data?.findIndex(
-  //   (av: any) => av._id === notViewedVideo.videoId
-  // );
-
-  // console.log(findUserViewedVideo);
-  // console.log(notViewedVideo);
-  // console.log(activeLastNotViewedVideoIndex);
-
-  // if (activeLastNotViewedVideoIndex >= 0) {
-  //   // means there is 1 or more video not viewed yet
-  //   active = data[activeLastNotViewedVideoIndex];
-  // } else {
-  //   active = data[data.length - 1];
-  // }
-
   const [form, setForm] = useState(initialValues);
   const [replyForm, setReplyForm] = useState(initialReplyValues);
   const [reviewForm, setReviewForm] = useState(initialReviewValues);
@@ -331,8 +306,6 @@ const CourseClassContent: FC<Props> = ({
       if (filterVideo?.viewed) {
         return null;
       } else {
-        // const updatedCounter = progressCounter + 1;
-        // setProgressCounter(updatedCounter);
         await updateUserVideosViewed({
           courseId,
           videoId: filterVideo?.videoId,
@@ -343,7 +316,6 @@ const CourseClassContent: FC<Props> = ({
 
   // finish course btn
   const handleFinishCourse = async () => {
-    // console.log("finish course");
     // update progress counter
     const correspondVideo = user?.courses?.filter(
       (c: any) => c?.courseId === courseId
@@ -356,8 +328,6 @@ const CourseClassContent: FC<Props> = ({
       if (filterVideo?.viewed) {
         return null;
       } else {
-        // const updatedCounter = progressCounter + 1;
-        // setProgressCounter(updatedCounter);
         await updateUserVideosViewed({
           courseId,
           videoId: filterVideo?.videoId,
@@ -373,9 +343,6 @@ const CourseClassContent: FC<Props> = ({
   const viewedVideo = activeCourseFromUsersCourses?.progress?.filter(
     (v: any) => v.viewed === true
   );
-
-  // console.log(userData.user);
-  // console.log(viewedVideo);
 
   setProgressCounter(viewedVideo?.length);
 
@@ -495,15 +462,6 @@ const CourseClassContent: FC<Props> = ({
 
     return course.reviewed;
   };
-
-  // console.log(replyForm);
-  // console.log(active._id);
-  // console.log(active);
-  // console.log(form);
-
-  // console.log(visibleQuestion);
-  // console.log(user);
-  // console.log(courseData);
 
   return (
     <>
