@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import UserProtected from "../../hooks/userProtected";
 import {
   useLoadUserQuery,
@@ -10,6 +10,8 @@ import CourseClass from "../../components/Course/Class/CourseClass";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader/Loader";
+import { useSelector } from "react-redux";
+import { useGetCourseContentDataQuery } from "@/redux/course/courseApi";
 
 type Props = {};
 
@@ -17,29 +19,31 @@ const Page = ({ params }: any) => {
   const id = params.id;
 
   const { refetch } = useRefreshTokenQuery(undefined, { skip: false });
-  const { data, isLoading, error } = useLoadUserQuery(undefined, {});
+  const { user } = useSelector((state: any) => state.auth);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const {
+    data: courseData,
+    refetch: courseContentRefetch,
+    isLoading,
+  } = useGetCourseContentDataQuery(courseId, {});
 
   // refresh token when page loads
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   // check if user has purchased this course
   useEffect(() => {
-    if (data) {
-      const hasUserPurchased = data.user.courses.find(
-        (c: any) => c.courseId === id
-      );
-      if (!hasUserPurchased) {
-        toast.error("Access Denied: You have not purchased this course");
-        redirect("/");
-      }
-    }
-
-    if (error) {
+    const hasUserPurchased = user.courses.find((c: any) => c.courseId === id);
+    if (!hasUserPurchased) {
+      toast.error("Access Denied: You have not purchased this course");
       redirect("/");
+      return;
     }
-  }, [data, error]);
+    console.log(hasUserPurchased);
+    setCourseId(hasUserPurchased.courseId);
+
+    // if (error) {
+    //   redirect("/");
+    // }
+  }, [id, user, courseId]);
 
   return (
     <div>

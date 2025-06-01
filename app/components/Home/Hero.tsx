@@ -1,20 +1,32 @@
+import { BannerContent } from "@/app/types/content";
 import Image from "next/image";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC } from "react";
 
 type Props = {
-  data: any;
+  hero:
+    | {
+        image: {
+          id: string;
+          url: string;
+        };
+        title: string;
+        subTitle: string;
+      }
+    | undefined;
 };
 
-const Hero: FC<Props> = ({ data }) => {
+const Hero: FC<Props> = ({ hero }) => {
+  if (!hero) return null;
+
   return (
     <div className=" w-screen xl:h-screen p-10 flex xl:flex-row flex-col xl:justify-between lg:items-center ">
       {/* text */}
       <div className=" xl:w-[55%] w-full ">
         <h1 className=" text-[1.8rem] sm:text-[2.2rem] lg:text-[2.5rem] font-medium mb-4 lg:max-w-[80%] lg:text-left text-center">
-          {data?.layout?.banner?.title}
+          {hero?.title}
         </h1>
         <p className=" leading-[1.6rem] sm:leading-[1.9rem] text-[14px] lg:text-left text-center">
-          {data?.layout?.banner?.subTitle}
+          {hero.subTitle}
         </p>
         <br />
 
@@ -29,7 +41,7 @@ const Hero: FC<Props> = ({ data }) => {
       {/* image */}
       <div className=" w-full sm:w-[70%] lg:w-[50%] h-[50%]  xl:mx-0 mx-auto xl:w-[35%] xl:h-full hero_animation rounded-full xl:my-0 sm:my-20  mt-10 sm:mb-0 xl:pt-20">
         <Image
-          src={data?.layout?.banner?.image?.url}
+          src={hero?.image?.url}
           alt="banner_image"
           height={200}
           width={200}

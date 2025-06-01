@@ -10,8 +10,8 @@ const page = (props: Props) => {
   return (
     <div className=" min-h-screen">
       <Heading
-        title="Sign In - ByWay Learning Management System"
-        description="This is the registration page of online e-learning platform where people can have access to resources for learning"
+        title="Support - ByWay Learning Management System"
+        description="This is the contsct page of online e-learning platform where people can have access to resources for learning"
         keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Support, Faqs, Cutomer SUpport"
       />
       <Header activeItem={1} />

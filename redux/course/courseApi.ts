@@ -123,6 +123,16 @@ export const courseApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include" as const,
       }),
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+
+          console.log("COURSE DETAILS FETCHED");
+        } catch (error: any) {
+          console.log("ERROR FETCHING COURSE DETAILS", error);
+        }
+      },
     }),
 
     // add question

@@ -3,10 +3,11 @@ import React, { FC } from "react";
 
 type Props = {
   coursesLength: number;
-  usersLength: number;
+  usersLength: number | undefined;
 };
 
 const SuccessCount: FC<Props> = ({ coursesLength, usersLength }) => {
+  if (!usersLength) return;
   return (
     <div
       className={`${styles.paddingX} ${styles.paddingY}  w-full bg-white dark:bg-slate-900 flex sm:flex-row flex-col  items-center justify-center sm:mt-0 sm:mb-0 mt-20 sm:gap-0 gap-10`}

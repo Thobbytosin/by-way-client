@@ -1,14 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Heading from "./utils/Heading";
 import Header from "./components/Header";
-import { useRefreshTokenQuery } from "../redux/api/apiSlice";
 import Hero from "./components/Home/Hero";
 import CoursesCategory from "./components/Home/CoursesCategory";
-import { useGetAllCoursesWithoutPurchaseQuery } from "../redux/course/courseApi";
-import { useGetHeroDataQuery } from "../redux/layout/layoutApi";
-import { useGetUserLatestQuery } from "../redux/user/userApi";
 import Loader from "./components/Loader/Loader";
 import SuccessCount from "./components/Home/SuccessCount";
 import Categories from "./components/Home/Categories";
@@ -17,66 +14,33 @@ import Features from "./components/Home/Features";
 import Testimonials from "./components/Home/Testimonials";
 import LatestBlogs from "./components/Home/LatestBlogs";
 import Footer from "./components/Footer";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { useContentQueries } from "./hooks/api/content.api";
+import { useCourseQueries } from "./hooks/api/course.api";
+import { useUserQueries } from "./hooks/api/user.api";
+import { useServerStatus } from "./hooks/api/useServerStatus";
+import ServerErrorUI from "./components/Home/ServerErrorUI";
 
 interface Props {}
 
 const Page: FC<Props> = (props) => {
-  const { refetch: refetchedData } = useRefreshTokenQuery(undefined, {
-    skip: false,
+  const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
+  const courses = useSelector((state: RootState) => state.course.coursesFree);
+  const { hero, loading: contentLoading, categories } = useContentQueries();
+  const { coursesDomainLoading } = useCourseQueries();
+  const { usersDomainData } = useUserQueries();
+  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+    checkInterval: 10000,
   });
 
-  const {
-    data: coursesData,
-    isLoading,
-    refetch,
-  } = useGetAllCoursesWithoutPurchaseQuery({});
-
-  // get banner
-  const {
-    data: heroData,
-    isLoading: heroIsLoading,
-    refetch: heroRefetched,
-  } = useGetHeroDataQuery("Banner", {
-    skip: false,
-  });
-
-  // TO GET USER COUNT
-  const {
-    data: usersData,
-    refetch: refetchUsersData,
-    isLoading: usersLoading,
-  } = useGetUserLatestQuery(undefined, {
-    skip: false,
-  });
-
-  // get categories
-
-  const {
-    data: categoriesData,
-    isLoading: categoriesIsLoading,
-    refetch: categoriesRefetched,
-  } = useGetHeroDataQuery("Categories", {
-    skip: false,
-  });
-
-  // refresh the token
   useEffect(() => {
-    refetchedData();
-    refetch();
-    heroRefetched();
-    refetchUsersData();
-  }, [
-    coursesData,
-    usersData,
-    refetch,
-    refetchUsersData,
-    refetchedData,
-    heroRefetched,
-  ]);
+    setIsMounted(true); // Set to true once the component is mounted
+  }, []);
 
   // fetch user latest role
   const fetchUsersData = (userId: string) => {
-    const updatedUser = usersData?.users?.filter(
+    const updatedUser = usersDomainData.usersList?.filter(
       (user: any) => user._id === userId
     );
 
@@ -89,65 +53,71 @@ const Page: FC<Props> = (props) => {
 
   // create new all courses reviews array
   const allReviews = Array.from(
-    new Set(coursesData?.courses?.map((item: any) => item.reviews))
+    new Set(courses?.map((item: any) => item.reviews))
   );
 
-  const updatedReviews = allReviews.flatMap((item: any) => item);
+  const updatedReviews = allReviews?.flatMap((item: any) => item);
+
+  if (!isMounted) return null;
+
+  if (
+    serverLoading ||
+    contentLoading ||
+    coursesDomainLoading.coursesFreeLoading
+  ) {
+    return <Loader key={"loading"} />;
+  }
 
   return (
-    <div>
-      <Heading
-        title="ByWay Learning Management System"
-        description="This is an online e-learning platform where people can have access to resources for learning"
-        keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
-      />
+    <>
+      <div>
+        <Heading
+          title="ByWay Learning Management System"
+          description="This is an online e-learning platform where people can have access to resources for learning"
+          keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
+        />
 
-      <Header />
+        {!contentLoading && !coursesDomainLoading.coursesFreeLoading && (
+          <Header />
+        )}
 
-      {heroIsLoading || isLoading || usersLoading ? (
-        <Loader key={1} />
-      ) : (
-        <>
-          {/* Hero */}
-          <Hero data={heroData} />
+        {!serverLoading && serverError ? (
+          <ServerErrorUI errorMessage={serverError} />
+        ) : (
+          <>
+            <Hero hero={hero} />
 
-          {/* Success Count */}
-          <SuccessCount
-            coursesLength={coursesData?.courses.length}
-            usersLength={usersData?.users.length}
-          />
+            <SuccessCount
+              coursesLength={courses?.length}
+              usersLength={usersDomainData.usersList?.length}
+            />
 
-          {/* Categories */}
-          <Categories
-            isLoading={categoriesIsLoading}
-            data={categoriesData?.layout?.categories}
-            key={1}
-            coursesData={coursesData?.courses}
-          />
+            <Categories
+              isLoading={contentLoading}
+              data={categories}
+              key={1}
+              coursesData={courses}
+            />
 
-          {/* blog */}
-          <LittleDesc />
+            <LittleDesc />
 
-          {/* Courses category */}
-          <CoursesCategory data={coursesData} isLoading={isLoading} />
+            <CoursesCategory courses={courses} />
 
-          {/* features */}
-          <Features />
+            <Features />
 
-          {/* testimonials */}
-          <Testimonials
-            reviews={updatedReviews}
-            fetchUsersData={fetchUsersData}
-          />
+            <Testimonials
+              reviews={updatedReviews}
+              fetchUsersData={fetchUsersData}
+            />
 
-          {/* latest resources */}
-          <LatestBlogs />
-        </>
-      )}
+            {/* //  latest resources  */}
+            <LatestBlogs />
+          </>
+        )}
 
-      {/* footer */}
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

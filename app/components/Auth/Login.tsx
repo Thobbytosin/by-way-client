@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,17 +11,12 @@ import { styles } from "../../styles/style";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
-import {
-  useLoginMutation,
-  useLogoutQuery,
-  useSocialAuthMutation,
-} from "../../../redux/auth/authApi";
-import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { redirect } from "next/navigation";
 import SimpleLoader from "../SimpleLoader/SimpleLoader";
+import { RootState } from "@/redux/store";
+import { useAuthMutations } from "@/app/hooks/api/auth.api";
 
 type Props = {};
 
@@ -39,84 +35,39 @@ const validationSchema = Yup.object().shape({
 });
 
 const Login = (props: Props) => {
-  const [isClient, setIsClient] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [login, { error, isSuccess }] = useLoginMutation();
-  const { user } = useSelector((state: any) => state.auth);
-  const { data } = useSession();
-  const [socialAuth, { error: socialError, isSuccess: socialSuccess }] =
-    useSocialAuthMutation();
-  const [logout, setLogout] = useState(false);
-  const {} = useLogoutQuery(undefined, { skip: logout ? false : true });
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { data: nextAuthData } = useSession();
+  const { loginUser, socialLoginUser } = useAuthMutations();
 
   // for social login
   useEffect(() => {
     if (!user) {
-      if (data) {
-        socialAuth({
-          name: data?.user?.name,
-          email: data?.user?.email,
-          avtar: data?.user?.image,
-        });
+      let formData;
+      if (nextAuthData) {
+        formData = {
+          name: nextAuthData.user?.name || "",
+          email: nextAuthData.user?.email || "",
+          avatar: nextAuthData.user?.image || "",
+        };
+
+        socialLoginUser(formData);
       }
     }
+  }, [nextAuthData]);
 
-    if (socialSuccess) {
-      // refetch();
-      toast.success("Login successfully");
-      redirect("/");
-    }
-
-    // to logout user
-    if (data === null) {
-      setLogout(true);
-    }
-
-    if (socialError) {
-      if ("data" in socialError) {
-        const errorData = socialError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [data, user, socialSuccess, socialError]);
-
-  // manual login
-  useEffect(() => {
-    if (isSuccess) {
-      // refetch();
-      toast.success("Login successfully");
-      redirect("/");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, error]);
-
+  // formik login
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
     validationSchema: validationSchema,
-    onSubmit: async (data, { setSubmitting }) => {
-      try {
-        await login(data);
-      } catch (error: any) {
-      } finally {
-        setSubmitting(false);
-      }
+    onSubmit: async (formData) => {
+      loginUser(formData);
     },
   });
-  const { errors, touched, values, handleChange, handleSubmit, isSubmitting } =
-    formik;
+  const { errors, touched, handleChange, handleSubmit, isSubmitting } = formik;
 
   return (
     <div className=" w-full h-full flex items-center justify-center flex-col lg:flex-row-reverse bg-white dark:bg-black ">

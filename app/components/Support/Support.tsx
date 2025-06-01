@@ -7,35 +7,33 @@ import call from "../../../public/assets/call.png";
 import Image from "next/image";
 import { useGetHeroDataQuery } from "../../../redux/layout/layoutApi";
 import toast from "react-hot-toast";
+import { useContentQueries } from "@/app/hooks/api/content.api";
+import ServerErrorUI from "../Home/ServerErrorUI";
+import { useServerStatus } from "@/app/hooks/api/useServerStatus";
+import Loader from "../Loader/Loader";
 
 type Props = {};
 
 const Support = (props: Props) => {
-  const { data, error, isLoading, refetch } = useGetHeroDataQuery("FAQ", {
-    refetchOnMountOrArgChange: true,
-  });
-  const [faqs, setFaqs] = useState<any>([]);
+  const { faqs, loading: contentLoading } = useContentQueries();
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (data) {
-      setFaqs(data.layout.faq);
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(
-          "Could not fetch Frequently Asks Questions. Kindly refresh this page."
-        );
-      }
-    }
-  }, [data, error]);
+  const {
+    error: serverError,
+    isOnline: serverOnline,
+    isLoading: serverLoading,
+  } = useServerStatus({ checkInterval: 10000 });
 
   // Handle toggle functionality
   const handleToggleAnswer = (id: any) => {
     setActiveQuestionId((prev) => (prev === id ? null : id));
   };
+
+  if (serverLoading || contentLoading) {
+    return <Loader key={"loading"} />;
+  }
+
+  if (!serverLoading && serverError)
+    return <ServerErrorUI errorMessage={serverError} />;
 
   return (
     <>

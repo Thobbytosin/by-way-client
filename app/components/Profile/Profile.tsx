@@ -19,11 +19,10 @@ const Profile = (props: Props) => {
   const [logout, setLogout] = useState(false);
   const [active, setActive] = useState(0);
   const [avatar, setAvatar] = useState(null);
-  const {} = useLogoutQuery(undefined, { skip: logout ? false : true });
 
   const logoutHandler = async () => {
     setLogout(true);
-    await signOut(); // sign out the session
+    await signOut(); // sign out the next auth session too
   };
 
   if (typeof window !== "undefined") {

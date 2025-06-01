@@ -36,9 +36,7 @@ import { useRouter } from "next/navigation";
 
 import socketID from "socket.io-client";
 import CourseClassContentList from "./CourseClassContentList";
-
-const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "";
-const socketId = socketID(ENDPOINT, { transports: ["websocket"] });
+import { useSocketNotification } from "@/app/hooks/useSocketNotification";
 
 const subTags = ["Details", "Qs & As", "Reviews"];
 
@@ -73,6 +71,7 @@ const CourseClassContent: FC<Props> = ({
 }) => {
   // to set the active video in the array
   // let [active, setActive] = useState<any>({});
+  const { emitNotification } = useSocketNotification();
   const [showCompletedModal, setShowCompletedModal] = useState(true);
   const router = useRouter();
   const [rating, setRating] = useState(1);
@@ -190,7 +189,7 @@ const CourseClassContent: FC<Props> = ({
     if (isSuccess) {
       courseContentRefetch();
       toast.success("Question Submitted");
-      socketId.emit("notification", {
+      emitNotification({
         title: "New Question Received",
         message: `You have a new question in ${active.title} course.`,
         userId: user?._id,
@@ -212,7 +211,7 @@ const CourseClassContent: FC<Props> = ({
       toast.success("Answer Submitted");
       // if the answer is not from an admin, send notification again
       if (user?.role !== "admin") {
-        socketId.emit("notification", {
+        emitNotification({
           title: "New Reply to Question Received",
           message: `You have a new reply to a question in ${active.title} course.`,
           userId: user?._id,
@@ -234,7 +233,7 @@ const CourseClassContent: FC<Props> = ({
       refetch(); // user info refresh
       courseRefetch(); // refetch course
       toast.success("Thanks for your feedback");
-      socketId.emit("notification", {
+      emitNotification({
         title: "New Review Received",
         message: `You have a new review in ${active.title} course.`,
         userId: user?._id,

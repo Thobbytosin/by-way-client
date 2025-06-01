@@ -1,25 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import UserProtected from "../../hooks/userProtected";
 import Heading from "../../utils/Heading";
 import Header from "../../components/Header";
 import { useSelector } from "react-redux";
 import Profile from "../../components/Profile/Profile";
-import { useRefreshTokenQuery } from "../../../redux/api/apiSlice";
+import Loader from "@/app/components/Loader/Loader";
 
 type Props = {};
 
 const Page = (props: Props) => {
-  const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(null);
   const { user } = useSelector((state: any) => state.auth);
-  const { refetch } = useRefreshTokenQuery(undefined, { skip: false });
+  const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
 
-  // refresh token when page loads
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    setIsMounted(true); // Set to true once the component is mounted
+  }, []);
+
+  if (!isMounted) {
+    return <Loader key={"loading"} />;
+  }
 
   return (
     <div>
@@ -30,7 +31,7 @@ const Page = (props: Props) => {
           keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
         />
 
-        <Header activeItem={activeItem} />
+        <Header />
 
         <Profile />
       </UserProtected>
