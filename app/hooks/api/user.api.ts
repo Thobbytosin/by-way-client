@@ -19,21 +19,13 @@ import { UserDetail, UserList } from "@/app/types/user";
 
 export const useUserQueries = () => {
   const isMounted = typeof document !== "undefined";
-  const [isOnline, setIsOnline] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const canFetchUser: boolean = useServerStatus();
+  const { isLoading, isOnline } = useServerStatus();
 
-  useEffect(() => {
-    const checkServer = async () => {
-      if (isMounted) {
-        setIsOnline(await isServerOnline());
-      }
-    };
-
-    checkServer();
-  }, [isMounted]);
-
-  const commonOptions = { requiresAuth: false, enabled: isMounted && isOnline };
+  const commonOptions = {
+    requiresAuth: false,
+    enabled: !isLoading && isOnline,
+  };
 
   const {
     data: usersListResponse,
