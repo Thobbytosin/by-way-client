@@ -1,32 +1,48 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { CancelIcon } from "../../../icons/icons";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import Lottie from "lottie-react";
 import successAnimation from "../../../utils/successCheck.json";
 import { useRouter } from "next/navigation";
+import { useOrderMutations, useOrderQueries } from "@/app/hooks/api/order.api";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { Course } from "@/app/types/course";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 type Props = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  stripePromise: any;
-  clientSecret: string;
-  course: any;
-  user: any;
+  course: Course | undefined;
   setLoading: (value: boolean) => void;
 };
 
-const PaymentModal: FC<Props> = ({
-  open,
-  setOpen,
-  clientSecret,
-  stripePromise,
-  course,
-  user,
-  setLoading,
-}) => {
+const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
   const [orderSuccessModal, setOrderSuccessModal] = useState(false);
+  const { paymentIntentDomain } = useOrderMutations();
+  const { createPaymentIntent, data: clientSecret } = paymentIntentDomain;
+  const { stripeKeyDomain } = useOrderQueries();
+  const [stripePromise, setStripePromise] = useState<Stripe | null>(null);
+  const { publishableKey } = stripeKeyDomain;
+
+  // stripe
+  useEffect(() => {
+    const initStripe = async () => {
+      if (publishableKey) {
+        const k = await loadStripe(publishableKey);
+        setStripePromise(k);
+      }
+    };
+
+    initStripe();
+
+    // create payment
+    const amount = (course && Math.round(course?.price * 100)) || 0;
+    createPaymentIntent({ amount });
+  }, [publishableKey]);
 
   return (
     <div className=" fixed left-0 top-0 w-screen h-screen bg-black bg-opacity-80 flex justify-center items-center z-[99]">

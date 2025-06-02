@@ -24,7 +24,7 @@ export const useServerStatus = (options?: { checkInterval?: number }) => {
     if (!online) {
       wasOfflineRef.current = true; // track offline
       setIsOnline(false);
-      setError("Server Health check failed");
+      setError("Please check your network");
       consecutiveChecksRef.current = 0; // set to 0 when server is down
     } else {
       // show toast only if server is coming from being down

@@ -1,16 +1,13 @@
 import { useFormik } from "formik";
 import Image from "next/image";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import * as Yup from "yup";
 import avatarDefault from "../../../public/assets/avatar.png";
 import { AiFillCamera } from "react-icons/ai";
-import {
-  useUpdateAvatarMutation,
-  useUpdateUserInfoMutation,
-} from "../../../redux/user/userApi";
-import { useLoadUserQuery } from "../../../redux/api/apiSlice";
 import toast from "react-hot-toast";
 import Loader from "../Loader/Loader";
+import { useUserMutations } from "@/app/hooks/api/user.api";
+import { User } from "@/app/types/api";
 
 // validation schema
 const validationSchema = Yup.object().shape({
@@ -20,46 +17,11 @@ const validationSchema = Yup.object().shape({
 });
 
 type Props = {
-  user: any;
-  avatar: string | null;
+  user: User;
 };
 
-const ProfileInfo: FC<Props> = ({ user, avatar }) => {
-  const [updateAvatar, { isSuccess, error, isLoading }] =
-    useUpdateAvatarMutation();
-  const { refetch } = useLoadUserQuery(undefined, { skip: false });
-  const [updateUserInfo, { isSuccess: infoSuccess, error: infoError }] =
-    useUpdateUserInfoMutation();
-
-  // to effect the user info update
-  useEffect(() => {
-    if (infoSuccess) {
-      refetch();
-      toast.success("Profile updated successfully");
-    }
-
-    if (infoError) {
-      if ("data" in infoError) {
-        const errorData = infoError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [infoSuccess, infoError, refetch]);
-
-  // to effect the user profile image changes
-  useEffect(() => {
-    if (isSuccess) {
-      refetch();
-      toast.success("Profile Image updated successfully");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, error, refetch]);
+const ProfileInfo: FC<Props> = ({ user }) => {
+  const { userInfo, infoLoading } = useUserMutations();
 
   // for user profile image upload
   const handleImageChange = async (e: any) => {
@@ -70,7 +32,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
 
       form.append("avatar", file);
 
-      await updateAvatar(form);
+      userInfo.updateProfilePicture(form);
     } else {
       return toast.error("ERROR UPLOADING FILE TO SERVER");
     }
@@ -88,8 +50,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
           name: data.name,
         };
 
-        // await register(dataToSubmit);
-        await updateUserInfo(dataToSubmit);
+        userInfo.updateUser(dataToSubmit);
       } catch (error: any) {
       } finally {
         setSubmitting(false);
@@ -97,13 +58,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
     },
   });
 
-  const { errors, touched, values, handleChange, handleSubmit, isSubmitting } =
-    formik;
-
-  // const handleChange = (e: any) => {
-  //   setIsTyping(true);
-  //   setName(e.target.value);
-  // };
+  const { errors, touched, handleChange, handleSubmit, isSubmitting } = formik;
 
   return (
     <div className=" w-full h-full gap-8 lg:gap-4 flex flex-col items-center justify-center">
@@ -111,11 +66,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
       <div className=" lg:w-[140px] lg:h-[140px] sm:w-[110px] sm:h-[110px] rounded-full border-2 border-transparent mx-auto mb-8 relative">
         <div className=" w-full h-full flex justify-center items-end overflow-hidden rounded-full">
           <Image
-            src={
-              user?.avatar || avatar
-                ? user?.avatar?.url || avatar
-                : avatarDefault
-            }
+            src={user?.avatar ? user?.avatar?.url : avatarDefault}
             width={140}
             height={140}
             alt="profile_image"
@@ -156,7 +107,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
             type="text"
             id="name"
             name="name"
-            placeholder={user.name}
+            placeholder={user?.name ?? ""}
             onChange={handleChange}
             className={`block text-sm p-2 w-full outline-none bg-transparent border-b rounded-[6px]  mt-1 ${
               touched.name && errors.name
@@ -180,7 +131,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
             type="email"
             id="email"
             name="email"
-            value={user.email}
+            value={user?.email ?? ""}
             readOnly
             className={`block text-sm p-2 w-full outline-none bg-transparent border rounded-[6px] mt-1`}
           />
@@ -207,7 +158,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
         </div>
       )}
 
-      {isLoading && (
+      {infoLoading.updateAvatarPending && (
         <div className=" fixed left-0 top-0 w-screen h-screen bg-gray-900 bg-opacity-70 ">
           <Loader />
         </div>

@@ -1,11 +1,10 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC } from "react";
 import { useRouter } from "next/navigation";
-import { AccessTimeIcon, DoneAllIcon, GridViewIcon } from "../../icons/icons";
+import { DoneAllIcon } from "../../icons/icons";
 import Ratings from "../../utils/Ratings";
-import { useGetCourseDetailsQuery } from "../../../redux/course/courseApi";
-import toast from "react-hot-toast";
 import Loader from "../Loader/Loader";
 import Image from "next/image";
+import { useCourseQueries } from "@/app/hooks/api/course.api";
 
 type Props = {
   courseId: string;
@@ -31,26 +30,8 @@ export const formatSameContentTime = (course: any) => {
 
 const UserCourseCard: FC<Props> = ({ courseId, i, userCourse }) => {
   const router = useRouter();
-  const [course, setCourse] = useState<any>({});
-
-  const {
-    data,
-    isLoading,
-    error,
-    refetch: courseRefetch,
-  } = useGetCourseDetailsQuery(courseId);
-
-  useEffect(() => {
-    if (data) {
-      setCourse(data.course);
-    }
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [data, error]);
+  const { courseDomain } = useCourseQueries(courseId, false, true);
+  const { data: course, loading } = courseDomain;
 
   const calcPercentComplete = () => {
     const allCoursesNumber = userCourse?.progress?.length;
@@ -70,12 +51,12 @@ const UserCourseCard: FC<Props> = ({ courseId, i, userCourse }) => {
 
   return (
     <div className="">
-      {isLoading ? (
+      {loading ? (
         <Loader />
       ) : (
         <div
           key={i}
-          onClick={() => router.push(`/course-class/${course._id}`)}
+          onClick={() => router.push(`/course-class/${course?._id}`)}
           className=" cursor-pointer w-[200px] lg:w-[250px] h-[320px] rounded-lg bg-white  dark:bg-gray-900 p-4 hover:shadow-lg hover:border hover:border-gray-200 hover:dark:border-gray-900 transition duration-500"
         >
           {/* thumbnail */}
@@ -105,12 +86,14 @@ const UserCourseCard: FC<Props> = ({ courseId, i, userCourse }) => {
             </h4>
 
             {/* ratings */}
-            <div className=" my-2 flex items-end gap-2">
-              <Ratings key={i} rating={course?.ratings} color="text-golden" />
-              <p className=" text-[12px]">
-                ({Math.ceil(course?.ratings * course?.purchase)} ratings)
-              </p>
-            </div>
+            {course?.ratings && (
+              <div className=" my-2 flex items-end gap-2">
+                <Ratings key={i} rating={course?.ratings} color="text-golden" />
+                <p className=" text-[12px]">
+                  ({Math.ceil(course?.ratings * course?.purchase)} ratings)
+                </p>
+              </div>
+            )}
 
             <div className=" mt-4  w-full">
               {/* percentage completed */}

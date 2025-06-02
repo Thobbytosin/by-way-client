@@ -11,8 +11,6 @@ import { useServerStatus } from "./useServerStatus";
 
 export const useContentQueries = () => {
   const { isOnline, isLoading } = useServerStatus();
-  console.log(isOnline);
-  console.log("lOADING", isLoading);
 
   const commonOptions = {
     requiresAuth: false,

@@ -2,27 +2,6 @@ import { apiSlice } from "../api/apiSlice";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // update user avatar
-    updateAvatar: builder.mutation({
-      query: (avatar: any) => ({
-        url: "/update-profile-picture",
-        method: "PUT",
-        headers: {},
-        body: avatar,
-        credentials: "include" as const,
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          // console.log("USER PROFILE PICTURE UPLOADED SUCCESSFULLY");
-        } catch (error: any) {
-          // console.log("ERROR GETTING USER PROFILE PICTURE:", error);
-        }
-      },
-    }),
-
     // update user name or email or both
     updateUserInfo: builder.mutation({
       query: (info: any) => ({
@@ -139,20 +118,10 @@ export const userApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
-
-    // get user role
-    getUserLatest: builder.query({
-      query: () => ({
-        url: `/get-users-latest`,
-        method: "GET",
-        credentials: "include" as const,
-      }),
-    }),
   }),
 });
 
 export const {
-  useUpdateAvatarMutation,
   useUpdateUserInfoMutation,
   useUpdateUserPasswordMutation,
   useGetAllUsersQuery,
@@ -160,5 +129,4 @@ export const {
   useDeleteUserAccountMutation,
   useGetAllAdminsQuery,
   useUpdateUserVideosViewedMutation,
-  useGetUserLatestQuery,
 } = userApi;

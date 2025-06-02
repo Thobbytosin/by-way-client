@@ -1,10 +1,21 @@
+import { useAuthMutations } from "@/app/hooks/api/auth.api";
+import { signOut } from "next-auth/react";
 import React, { FC } from "react";
 
-type Props = {
-  logoutHandler: any;
-};
+type Props = {};
 
-const Logout: FC<Props> = ({ logoutHandler }) => {
+const Logout: FC<Props> = () => {
+  const { logoutUser } = useAuthMutations();
+
+  const handleLogout = async () => {
+    try {
+      logoutUser(null);
+      await signOut({
+        callbackUrl: "/",
+      });
+    } catch (error) {}
+  };
+
   return (
     <div className=" flex justify-center items-center h-full">
       <div>
@@ -14,7 +25,7 @@ const Logout: FC<Props> = ({ logoutHandler }) => {
         <div className=" flex justify-center gap-4 mt-6">
           <button
             type="submit"
-            onClick={() => logoutHandler()}
+            onClick={handleLogout}
             className=" bg-primary rounded-[6px] text-center w-28 py-2 text-white text-sm hover:bg-transparent hover:border-2 hover:border-primary hover:text-black hover:dark:text-white duration-300 transition"
           >
             Yes, I&apos;m sure

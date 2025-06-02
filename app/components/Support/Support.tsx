@@ -17,11 +17,9 @@ type Props = {};
 const Support = (props: Props) => {
   const { faqs, loading: contentLoading } = useContentQueries();
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
-  const {
-    error: serverError,
-    isOnline: serverOnline,
-    isLoading: serverLoading,
-  } = useServerStatus({ checkInterval: 10000 });
+  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+    checkInterval: 10000,
+  });
 
   // Handle toggle functionality
   const handleToggleAnswer = (id: any) => {

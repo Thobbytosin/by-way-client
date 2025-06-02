@@ -10,12 +10,19 @@ import {
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { useServerStatus } from "./useServerStatus";
-import { ALLCOURSESFREE } from "@/app/config/course.endpoints";
+import {
+  ALLCOURSESFREE,
+  GETCOURSEBYID,
+  GETCOURSEBYIDFREE,
+} from "@/app/config/course.endpoints";
 import { setCoursesFree } from "@/redux/course/course.slice";
-import { ApiResponse } from "@/app/types/api";
-import { CoursesFree } from "@/app/types/course";
+import { Course } from "@/app/types/course";
 
-export const useCourseQueries = () => {
+export const useCourseQueries = (
+  courseId?: string,
+  noAuth?: boolean,
+  needAuth?: boolean
+) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isOnline, isLoading } = useServerStatus();
 
@@ -24,11 +31,12 @@ export const useCourseQueries = () => {
     enabled: !isLoading && isOnline,
   };
 
+  // get free courses for landing page
   const {
     data: coursesFreeResponse,
     error: coursesFreeError,
     loading: coursesFreeLoading,
-  } = useQueryWrapper<ApiResponse<CoursesFree[]>>({
+  } = useQueryWrapper<Course[]>({
     endpoint: ALLCOURSESFREE,
     queryKey: ["courses-free"],
     ...commonOptions,
@@ -40,9 +48,49 @@ export const useCourseQueries = () => {
     }
   }, [coursesFreeResponse, dispatch]);
 
+  // get a course by id
+  const {
+    data: courseResponse,
+    error: courseError,
+    loading: courseLoading,
+  } = useQueryWrapper<Course>({
+    endpoint: GETCOURSEBYID,
+    params: `/${courseId}`,
+    queryKey: [`course-${courseId}`],
+    enabled: commonOptions.enabled && !!courseId && !noAuth && !!needAuth,
+    requiresAuth: true,
+  });
+
+  // get a course by id(free)
+  const {
+    data: courseFreeResponse,
+    error: courseFreeError,
+    loading: courseFreeLoading,
+  } = useQueryWrapper<Course>({
+    endpoint: GETCOURSEBYIDFREE,
+    params: `/${courseId}`,
+    queryKey: [`course-${courseId}-free`],
+    enabled: commonOptions.enabled && !!courseId && !!noAuth && !needAuth,
+    requiresAuth: false,
+  });
+
+  // console.log('FREE')
+
   return {
-    coursesDomainData: { coursesFree: coursesFreeResponse?.data },
-    coursesDomainLoading: { coursesFreeLoading },
-    coursesDomainError: { coursesFreeError },
+    coursesFreeDomain: {
+      data: coursesFreeResponse?.data,
+      loading: coursesFreeLoading,
+      error: coursesFreeError,
+    },
+    courseDomain: {
+      data: courseResponse?.data,
+      loading: courseLoading,
+      error: courseError,
+    },
+    courseFreeDomain: {
+      data: courseFreeResponse?.data,
+      loading: courseLoading,
+      error: courseFreeLoading,
+    },
   };
 };

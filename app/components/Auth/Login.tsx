@@ -17,6 +17,9 @@ import { useSelector } from "react-redux";
 import SimpleLoader from "../SimpleLoader/SimpleLoader";
 import { RootState } from "@/redux/store";
 import { useAuthMutations } from "@/app/hooks/api/auth.api";
+import { useServerStatus } from "@/app/hooks/api/useServerStatus";
+import Loader from "../Loader/Loader";
+import ServerErrorUI from "../Home/ServerErrorUI";
 
 type Props = {};
 
@@ -39,6 +42,9 @@ const Login = (props: Props) => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { data: nextAuthData } = useSession();
   const { loginUser, socialLoginUser } = useAuthMutations();
+  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+    checkInterval: 10000,
+  });
 
   // for social login
   useEffect(() => {
@@ -68,6 +74,13 @@ const Login = (props: Props) => {
     },
   });
   const { errors, touched, handleChange, handleSubmit, isSubmitting } = formik;
+
+  if (serverLoading) {
+    return <Loader key={"loading"} />;
+  }
+
+  if (!serverLoading && serverError)
+    return <ServerErrorUI errorMessage={serverError} />;
 
   return (
     <div className=" w-full h-full flex items-center justify-center flex-col lg:flex-row-reverse bg-white dark:bg-black ">

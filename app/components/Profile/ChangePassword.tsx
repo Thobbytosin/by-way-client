@@ -4,8 +4,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useUpdateUserPasswordMutation } from "../../../redux/user/userApi";
-import { useLoadUserQuery } from "../../../redux/api/apiSlice";
 import toast from "react-hot-toast";
+import { useUserMutations } from "@/app/hooks/api/user.api";
 
 type Props = {};
 
@@ -30,24 +30,7 @@ const ChangePassword = (props: Props) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [updateUserPassword, { isSuccess, error, isLoading }] =
-    useUpdateUserPasswordMutation();
-  const [loadUser, setLoadUser] = useState(false);
-  const {} = useLoadUserQuery(undefined, { skip: loadUser ? false : true });
-
-  useEffect(() => {
-    if (isSuccess) {
-      setLoadUser(true);
-      toast.success("Password updated");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, error]);
+  const { infoLoading, userInfo } = useUserMutations();
 
   const formik = useFormik({
     initialValues: {
@@ -63,7 +46,7 @@ const ChangePassword = (props: Props) => {
           newPassword: data.newPassword,
         };
 
-        await updateUserPassword(dataToSubmit);
+        userInfo.updatePassword(dataToSubmit);
       } catch (error: any) {
       } finally {
         setSubmitting(false);
@@ -199,7 +182,7 @@ const ChangePassword = (props: Props) => {
         </button>
       </form>
 
-      {isLoading && (
+      {infoLoading.updatePasswordPending && (
         <div className=" fixed left-0 top-0 w-screen h-screen bg-gray-900 bg-opacity-70 ">
           <Loader />
         </div>

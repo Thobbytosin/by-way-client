@@ -18,23 +18,21 @@ const Page = (props: Props) => {
     setIsMounted(true); // Set to true once the component is mounted
   }, []);
 
-  if (!isMounted) {
+  if (!isMounted && !user) {
     return <Loader key={"loading"} />;
   }
 
   return (
     <div>
-      <UserProtected>
-        <Heading
-          title={`${user?.name} Profile - ByWay Learning Management System`}
-          description="This is an online e-learning platform where people can have access to resources for learning"
-          keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
-        />
+      <Heading
+        title={`${user?.name} Profile - ByWay Learning Management System`}
+        description="This is an online e-learning platform where people can have access to resources for learning"
+        keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
+      />
 
-        <Header />
+      <Header />
 
-        <Profile />
-      </UserProtected>
+      <Profile />
     </div>
   );
 };

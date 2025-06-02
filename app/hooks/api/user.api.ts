@@ -1,25 +1,18 @@
-import { useEffect, useState } from "react";
-import { isServerOnline } from "@/app/utils/isServerOnline";
-import { GETLAYOUTTYPE } from "@/app/config/layout.endpoints";
 import { useQueryWrapper } from "./useQueryWrapper";
-import {
-  BannerContent,
-  CategoriesContent,
-  FAQsContent,
-} from "@/app/types/content";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
 import { useServerStatus } from "./useServerStatus";
-import { ALLCOURSESFREE } from "@/app/config/course.endpoints";
-import { setCoursesFree } from "@/redux/course/course.slice";
-import { ApiResponse } from "@/app/types/api";
-import { CoursesFree } from "@/app/types/course";
-import { GETUSERSLIST } from "@/app/config/user.endpoints";
-import { UserDetail, UserList } from "@/app/types/user";
+import {
+  GETADMIN,
+  GETUSERSLIST,
+  UPDATEAVATAR,
+  UPDATEUSERINFO,
+  UPDATEUSERPASSWORD,
+} from "@/app/config/user.endpoints";
+import { TUser, UserDetail } from "@/app/types/user";
+import { useMutateData } from "./useApi";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useUserQueries = () => {
-  const isMounted = typeof document !== "undefined";
-  const dispatch = useDispatch<AppDispatch>();
   const { isLoading, isOnline } = useServerStatus();
 
   const commonOptions = {
@@ -27,6 +20,7 @@ export const useUserQueries = () => {
     enabled: !isLoading && isOnline,
   };
 
+  // user lists
   const {
     data: usersListResponse,
     error: usersListError,
@@ -37,9 +31,95 @@ export const useUserQueries = () => {
     ...commonOptions,
   });
 
+  // admin
+  const {
+    data: adminResponse,
+    error: adminError,
+    loading: adminLoading,
+  } = useQueryWrapper<TUser>({
+    endpoint: GETADMIN,
+    queryKey: ["admin"],
+    ...commonOptions,
+  });
+
   return {
-    usersDomainData: { usersList: usersListResponse?.data || [] },
-    usersDomainLoading: { usersListLoading },
-    usersDomainError: { usersListError },
+    usersDomainData: {
+      usersList: usersListResponse?.data || [],
+      usersListLoading,
+      usersListError,
+    },
+    adminDomainData: {
+      admin: adminResponse?.data,
+      adminLoading,
+      adminError,
+    },
+  };
+};
+
+export const useUserMutations = () => {
+  const queryClient = useQueryClient();
+
+  // updateAvatar
+  const { mutate: updateProfilePicture, isPending: updateAvatarPending } =
+    useMutateData<null, FormData>({
+      method: "PUT",
+      mutationKey: ["update-avatar"],
+      url: UPDATEAVATAR,
+      skipAuthRefresh: false,
+      onSuccess: (response) => {
+        if (!response.success) return;
+
+        toast.success(response.message);
+
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      },
+      onError: (error) => {
+        toast.error(`${error.message}`);
+      },
+    });
+
+  // update User Info
+  const { mutate: updateUser } = useMutateData<
+    null,
+    { name?: string; email?: string }
+  >({
+    method: "PUT",
+    mutationKey: ["update-user-info"],
+    url: UPDATEUSERINFO,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // update User Info
+  const { mutate: updatePassword, isPending: updatePasswordPending } =
+    useMutateData<null, { oldPassword: string; newPassword: string }>({
+      method: "PUT",
+      mutationKey: ["update-user-password"],
+      url: UPDATEUSERPASSWORD,
+      skipAuthRefresh: false,
+      onSuccess: (response) => {
+        if (!response.success) return;
+
+        toast.success(response.message);
+
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      },
+      onError: (error) => {
+        toast.error(`${error.message}`);
+      },
+    });
+
+  return {
+    infoLoading: { updateAvatarPending, updatePasswordPending },
+    userInfo: { updateUser, updatePassword, updateProfilePicture },
   };
 };

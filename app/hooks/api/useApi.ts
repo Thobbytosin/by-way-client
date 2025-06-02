@@ -25,7 +25,7 @@ export function useFetchData<T>({
   staleTime = 1000 * 60 * 5,
 }: FetchOptions) {
   return useQuery<ApiResponse<T>, ApiError>({
-    queryKey: [queryKey],
+    queryKey: [...queryKey],
     queryFn: async () => {
       const config = {
         method,
@@ -78,7 +78,7 @@ export function useMutateData<TResponse, TRequest = unknown>({
   onError,
 }: MutationOptions<TResponse, TRequest>) {
   return useMutation<ApiResponse<TResponse>, ApiError, TRequest>({
-    mutationKey,
+    mutationKey: [...mutationKey],
     mutationFn: async (data: TRequest) => {
       const config = {
         method,

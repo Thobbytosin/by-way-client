@@ -3,7 +3,6 @@
 import React, { FC, Suspense, useEffect } from "react";
 import Heading from "../utils/Heading";
 import Header from "../components/Header";
-import { useRefreshTokenQuery } from "../../redux/api/apiSlice";
 import Courses from "../components/Courses/Courses";
 import Footer from "../components/Footer";
 // import { useSearchParams } from "next/navigation";
@@ -15,14 +14,7 @@ interface Props {
 }
 
 const Page = ({ searchParams }: Props) => {
-  const { refetch } = useRefreshTokenQuery({});
-  // const searchParams = useSearchParams(); // This is client-side
   const search = searchParams?.search;
-
-  // Refresh the token
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
 
   return (
     <div>

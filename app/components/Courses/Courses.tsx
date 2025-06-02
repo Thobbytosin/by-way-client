@@ -3,30 +3,28 @@ import SearchBar from "../../utils/SearchBar";
 import React, { FC, useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useGetHeroDataQuery } from "../../../redux/layout/layoutApi";
-import { useGetAllCoursesWithoutPurchaseQuery } from "../../../redux/course/courseApi";
-
 import CourseCard from "../Course/CourseCard";
 import { styles } from "../../styles/style";
 import Loader from "../Loader/Loader";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useContentQueries } from "@/app/hooks/api/content.api";
+import { useCourseQueries } from "@/app/hooks/api/course.api";
 
 type Props = {
   search: any;
 };
 
 const Courses: FC<Props> = ({ search }) => {
-  // const [search, setSearch] = useState(search)
   const [searchText, setSearchText] = useState("");
   const router = useRouter();
-
+  const coursesData = useSelector(
+    (state: RootState) => state.course.coursesFree
+  );
   const [category, setCategory] = useState(search || "All");
   const [courses, setCourses] = useState([]);
-  const { data: categoriesData, isLoading: categoriesLoading } =
-    useGetHeroDataQuery("Categories", {});
-  const {
-    data: coursesData,
-    isLoading: coursesIsLoading,
-    refetch: coursesRefetch,
-  } = useGetAllCoursesWithoutPurchaseQuery({});
+  const { categories } = useContentQueries();
+  const { coursesFreeDomain } = useCourseQueries();
 
   //   update params
   const updateSearchParam = (newSearchValue: string) => {
@@ -42,11 +40,9 @@ const Courses: FC<Props> = ({ search }) => {
   };
 
   useEffect(() => {
-    coursesRefetch();
-
     // filter all
     if (category === "All") {
-      setCourses(coursesData?.courses);
+      setCourses(coursesData);
 
       return;
     }
@@ -54,7 +50,7 @@ const Courses: FC<Props> = ({ search }) => {
     // filter by category
     if (category !== "All" && category !== "" && search !== "") {
       setCourses(
-        coursesData?.courses?.filter(
+        coursesData?.filter(
           (item: any) =>
             item.category?.toLowerCase().startsWith(search?.toLowerCase()) ||
             item.category === category ||
@@ -68,7 +64,7 @@ const Courses: FC<Props> = ({ search }) => {
     // filter by search term from page
     if (category === "" && search !== "" && searchText) {
       setCourses(
-        coursesData?.courses?.filter(
+        coursesData?.filter(
           (item: any) =>
             item.name.toLowerCase().includes(searchText?.toLowerCase()) ||
             item.category.toLowerCase().includes(searchText?.toLowerCase())
@@ -96,7 +92,7 @@ const Courses: FC<Props> = ({ search }) => {
 
   return (
     <div className="min-h-screen">
-      {coursesIsLoading ? (
+      {coursesFreeDomain.loading ? (
         <Loader />
       ) : (
         <>
@@ -138,7 +134,7 @@ const Courses: FC<Props> = ({ search }) => {
                 All
               </div>
               {/* rest of the categories */}
-              {categoriesData?.layout?.categories?.map((c: any) => (
+              {categories?.map((c: any) => (
                 <div
                   key={c?._id}
                   className={`px-6 py-1 text-xs text-center rounded-full font-medium cursor-pointer ${

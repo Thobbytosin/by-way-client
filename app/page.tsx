@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, use, useEffect, useState } from "react";
 import Heading from "./utils/Heading";
 import Header from "./components/Header";
 import Hero from "./components/Home/Hero";
@@ -28,11 +28,13 @@ const Page: FC<Props> = (props) => {
   const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
   const courses = useSelector((state: RootState) => state.course.coursesFree);
   const { hero, loading: contentLoading, categories } = useContentQueries();
-  const { coursesDomainLoading } = useCourseQueries();
+  const { coursesFreeDomain } = useCourseQueries();
   const { usersDomainData } = useUserQueries();
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
+  const { user } = useSelector((state: RootState) => state.auth);
+  // console.log("USER", user);
 
   useEffect(() => {
     setIsMounted(true); // Set to true once the component is mounted
@@ -60,11 +62,7 @@ const Page: FC<Props> = (props) => {
 
   if (!isMounted) return null;
 
-  if (
-    serverLoading ||
-    contentLoading ||
-    coursesDomainLoading.coursesFreeLoading
-  ) {
+  if (serverLoading || contentLoading || coursesFreeDomain.loading) {
     return <Loader key={"loading"} />;
   }
 
@@ -77,9 +75,7 @@ const Page: FC<Props> = (props) => {
           keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
         />
 
-        {!contentLoading && !coursesDomainLoading.coursesFreeLoading && (
-          <Header />
-        )}
+        {!contentLoading && !coursesFreeDomain.loading && <Header />}
 
         {!serverLoading && serverError ? (
           <ServerErrorUI errorMessage={serverError} />

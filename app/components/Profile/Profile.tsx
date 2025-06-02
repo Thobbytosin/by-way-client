@@ -7,23 +7,21 @@ import { useSelector } from "react-redux";
 import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import UserCourses from "./UserCourses";
-import { signOut } from "next-auth/react";
 import Logout from "../../components/Auth/Logout";
-import { useLogoutQuery } from "../../../redux/auth/authApi";
+import { useServerStatus } from "@/app/hooks/api/useServerStatus";
+import ServerErrorUI from "../Home/ServerErrorUI";
+import { RootState } from "@/redux/store";
 
 type Props = {};
 
 const Profile = (props: Props) => {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [scroll, setScroll] = useState(false);
-  const [logout, setLogout] = useState(false);
   const [active, setActive] = useState(0);
   const [avatar, setAvatar] = useState(null);
-
-  const logoutHandler = async () => {
-    setLogout(true);
-    await signOut(); // sign out the next auth session too
-  };
+  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+    checkInterval: 10000,
+  });
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
@@ -34,6 +32,9 @@ const Profile = (props: Props) => {
       }
     });
   }
+
+  if (!serverLoading && serverError)
+    return <ServerErrorUI errorMessage={serverError} />;
 
   return (
     <div
@@ -54,10 +55,10 @@ const Profile = (props: Props) => {
 
       {/* content  */}
       <div className="w-full bg-[rgba(226,226,226,0.35)] dark:bg-[#f8fafc09] rounded-xl sm:p-0 p-8">
-        {active === 0 && <ProfileInfo avatar={avatar} user={user} />}
-        {active === 1 && <UserCourses user={user} />}
+        {user && active === 0 && <ProfileInfo user={user} />}
+        {user && active === 1 && <UserCourses user={user} />}
         {active === 2 && <ChangePassword />}
-        {active === 3 && <Logout logoutHandler={logoutHandler} />}
+        {active === 3 && <Logout />}
       </div>
     </div>
   );

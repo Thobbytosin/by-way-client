@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -12,14 +13,13 @@ import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import CustomModal from "../../utils/CustomModal";
 import Verification from "../../utils/Verification";
-import {
-  useRegisterMutation,
-  useSocialAuthMutation,
-} from "../../../redux/auth/authApi";
+import { useRegisterMutation } from "../../../redux/auth/authApi";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
+import { useAuthMutations } from "@/app/hooks/api/auth.api";
+import { RootState } from "@/redux/store";
 
 type Props = {};
 
@@ -48,34 +48,25 @@ const Register = (props: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [register, { isSuccess, data, error }] = useRegisterMutation();
-  const [socialAuth, { error: socialError, isSuccess: socialSuccess }] =
-    useSocialAuthMutation();
-  const { user, token } = useSelector((state: any) => state.auth);
-  const { data: sessionData } = useSession();
+  const { socialLoginUser } = useAuthMutations();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { data: nextAuthData } = useSession();
 
   // for social login
   useEffect(() => {
     if (!user) {
-      if (sessionData) {
-        socialAuth({
-          name: sessionData?.user?.name,
-          email: sessionData?.user?.email,
-          avtar: sessionData?.user?.image,
-        });
+      let formData;
+      if (nextAuthData) {
+        formData = {
+          name: nextAuthData.user?.name || "",
+          email: nextAuthData.user?.email || "",
+          avatar: nextAuthData.user?.image || "",
+        };
+
+        socialLoginUser(formData);
       }
     }
-
-    if (sessionData && socialSuccess) {
-      toast.success("Login successfully");
-    }
-
-    if (socialError) {
-      if ("data" in socialError) {
-        const errorData = socialError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [sessionData, user]);
+  }, [nextAuthData]);
 
   // to check data from register server
   useEffect(() => {

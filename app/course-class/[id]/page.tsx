@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import UserProtected from "../../hooks/userProtected";
 import {
   useLoadUserQuery,
   useRefreshTokenQuery,
@@ -47,17 +46,15 @@ const Page = ({ params }: any) => {
 
   return (
     <div>
-      <UserProtected>
-        {isLoading ? (
-          <div className=" w-screen h-screen">
-            <Loader />
-          </div>
-        ) : (
-          <>
-            <CourseClass courseId={id} />
-          </>
-        )}
-      </UserProtected>
+      {isLoading ? (
+        <div className=" w-screen h-screen">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <CourseClass courseId={id} />
+        </>
+      )}
     </div>
   );
 };

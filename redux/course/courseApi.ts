@@ -39,25 +39,6 @@ export const courseApi = apiSlice.injectEndpoints({
       },
     }),
 
-    // get all courses without purchase
-    getAllCoursesWithoutPurchase: builder.query({
-      query: () => ({
-        url: "/get-courses",
-        method: "GET",
-        credentials: "include" as const,
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          // console.log("ALL COURSES GOTTEN SUCCESSFULLY");
-        } catch (error: any) {
-          // console.log("ERROR GETTING ALL COURSES:", error);
-        }
-      },
-    }),
-
     // delete a course
     deleteCourse: builder.mutation({
       query: (courseId) => ({
@@ -93,25 +74,6 @@ export const courseApi = apiSlice.injectEndpoints({
           // console.log("COURSE EDITED");
         } catch (error: any) {
           // console.log("ERROR EDITING COURSE", error);
-        }
-      },
-    }),
-
-    // get a course by id
-    getCourseDetails: builder.query({
-      query: (id) => ({
-        url: `/get-course/${id}`,
-        method: "GET",
-        credentials: "include" as const,
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          // console.log("COURSE DETAILS FETCHED");
-        } catch (error: any) {
-          // console.log("ERROR FETCHING COURSE DETAILS", error);
         }
       },
     }),
@@ -182,8 +144,6 @@ export const {
   useGetAllCoursesQuery,
   useDeleteCourseMutation,
   useUpdateCourseMutation,
-  useGetCourseDetailsQuery,
-  useGetAllCoursesWithoutPurchaseQuery,
   useGetCourseContentDataQuery,
   useAddQuestionMutation,
   useAddReplyToQuestionMutation,

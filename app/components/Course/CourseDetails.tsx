@@ -8,9 +8,8 @@ import {
 } from "../../icons/icons";
 import { styles } from "../../styles/style";
 import Ratings from "../../utils/Ratings";
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import { formatSameContentTime } from "./CourseCard";
-import { useGetAllAdminsQuery } from "../../../redux/user/userApi";
 import CourseSyllabus from "./CourseSyllabus";
 import CoursePlayer from "../../utils/CoursePlayer";
 import { extras, getDiscountedPrice } from "../Admin/Course/CoursePreview";
@@ -19,29 +18,28 @@ import { useRouter } from "next/navigation";
 import SimpleLoader from "../SimpleLoader/SimpleLoader";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { Course } from "@/app/types/course";
+import { RootState } from "@/redux/store";
+import { useUserQueries } from "@/app/hooks/api/user.api";
+import { useServerStatus } from "@/app/hooks/api/useServerStatus";
+import ServerErrorUI from "../Home/ServerErrorUI";
 
 type Props = {
-  course: any;
-  stripePromise: any;
-  clientSecret: string;
+  course: Course | undefined;
 };
 
-const CourseDetails: FC<Props> = ({ course, stripePromise, clientSecret }) => {
-  const { user } = useSelector((state: any) => state.auth);
+const CourseDetails: FC<Props> = ({ course }) => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [open, setOpen] = useState(false);
-  const [admin, setAdmin] = useState<any>({});
   const [loading, setLoading] = useState(false);
-  const { data } = useGetAllAdminsQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
   const router = useRouter();
+  const { adminDomainData } = useUserQueries();
+  const { admin } = adminDomainData;
+  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+    checkInterval: 10000,
+  });
 
-  useEffect(() => {
-    if (data) {
-      setAdmin(data.admins[0]);
-    }
-  }, [data]);
+  console.log("USER", user);
 
   const hasUserBoughtCourse = user?.courses?.find(
     (c: any) => c.courseId === course?._id
@@ -50,6 +48,9 @@ const CourseDetails: FC<Props> = ({ course, stripePromise, clientSecret }) => {
   const handleOrder = () => {
     setOpen(true);
   };
+
+  if (!serverLoading && serverError)
+    return <ServerErrorUI errorMessage={serverError} />;
 
   return (
     <>
@@ -323,10 +324,7 @@ const CourseDetails: FC<Props> = ({ course, stripePromise, clientSecret }) => {
             <PaymentModal
               open={open}
               setOpen={setOpen}
-              stripePromise={stripePromise}
-              clientSecret={clientSecret}
               course={course}
-              user={user}
               setLoading={setLoading}
             />
           )}

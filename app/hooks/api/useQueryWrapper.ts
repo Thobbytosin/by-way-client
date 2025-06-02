@@ -1,5 +1,3 @@
-import { isServerOnline } from "@/app/utils/isServerOnline";
-import { useEffect, useState } from "react";
 import { useFetchData } from "./useApi";
 
 interface QueryOptions {

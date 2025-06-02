@@ -1,6 +1,10 @@
-import { LOGIN, SOCIALLOGIN } from "@/app/config/auth.endpoints";
+import {
+  LOGIN,
+  LOGOUT,
+  SIGNUP,
+  SOCIALLOGIN,
+} from "@/app/config/auth.endpoints";
 import { useQueryClient } from "@tanstack/react-query";
-import { ApiResponse, User } from "@/app/types/api";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/auth/authSlice";
@@ -11,6 +15,7 @@ import { useQueryWrapper } from "./useQueryWrapper";
 import { useEffect } from "react";
 import { FETCHUSER } from "@/app/config/user.endpoints";
 import { useServerStatus } from "./useServerStatus";
+import { TUser } from "@/app/types/user";
 
 // AUTH GET REQUEST
 export const useAuth = () => {
@@ -20,11 +25,9 @@ export const useAuth = () => {
     typeof document !== "undefined" &&
     document.cookie.includes("_can_logged_t");
 
-  const { data, error, loading, isSuccess } = useQueryWrapper<
-    ApiResponse<User>
-  >({
+  const { data, error, loading, isSuccess } = useQueryWrapper<TUser>({
     endpoint: FETCHUSER,
-    queryKey: ["auth-user"],
+    queryKey: ["user"],
     requiresAuth: true,
     enabled: !isLoading && isOnline && isUserSignedIn,
   });
@@ -38,6 +41,7 @@ export const useAuth = () => {
   return {
     error,
     loading,
+    data,
   };
 };
 
@@ -50,7 +54,7 @@ export const useAuthMutations = () => {
   // login user
   const { mutate: loginUser } = useMutateData<
     {
-      user: User;
+      user: TUser;
       expiresAt: number;
     },
     { email: string; password: string }
@@ -62,7 +66,7 @@ export const useAuthMutations = () => {
     onSuccess: (response) => {
       if (!response.success) return;
 
-      toast.success("Login successfully");
+      toast.success(response.message);
 
       dispatch(setUser(response.data?.user));
 
@@ -82,7 +86,7 @@ export const useAuthMutations = () => {
 
   // login via google, github
   const { mutate: socialLoginUser } = useMutateData<
-    { user: User; expiresAt: number },
+    { user: TUser; expiresAt: number },
     { name: string; email: string; avatar?: string }
   >({
     method: "POST",
@@ -92,7 +96,7 @@ export const useAuthMutations = () => {
     onSuccess: (response) => {
       toast.success("Login successfully");
 
-      dispatch(setUser(response));
+      dispatch(setUser(response.data?.user));
 
       router.push("/");
 
@@ -109,5 +113,47 @@ export const useAuthMutations = () => {
     },
   });
 
-  return { loginUser, socialLoginUser };
+  // logout user
+  const { mutate: logoutUser } = useMutateData<null, null>({
+    method: "POST",
+    mutationKey: ["logoutUser"],
+    url: LOGOUT,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      dispatch(setUser(null));
+
+      localStorage.removeItem("access_token_expiry");
+
+      queryClient.removeQueries({ queryKey: ["user"] });
+    },
+    onError: (error) => {
+      console.log("LOGOUT ERROR", error);
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // sign up user
+  const { mutate: registerUser } = useMutateData<
+    null,
+    { name: string; email: string; password: string }
+  >({
+    method: "POST",
+    mutationKey: ["registerUser"],
+    url: SIGNUP,
+    skipAuthRefresh: true,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  return { loginUser, socialLoginUser, logoutUser, registerUser };
 };
