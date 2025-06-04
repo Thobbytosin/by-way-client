@@ -1,39 +1,15 @@
-"use client";
+import React from "react";
 
-import React, { FC, Suspense, useEffect } from "react";
-import Heading from "../utils/Heading";
-import Header from "../components/Header";
-import Courses from "../components/Courses/Courses";
-import Footer from "../components/Footer";
-// import { useSearchParams } from "next/navigation";
+import Courses from "../../components/Courses/Courses";
+import { Metadata } from "next";
 
-interface Props {
-  searchParams: {
-    search?: string; // search query parameter from the URL
-  };
-}
-
-const Page = ({ searchParams }: Props) => {
-  const search = searchParams?.search;
-
-  return (
-    <div>
-      <Heading
-        title="Courses - ByWay Learning Management System"
-        description="This is the courses page of ByWay e-learning platform where people can have access to resources for learning"
-        keywords="Programming, MERN, TypeScript, ReactJs, NextJs, Web development"
-      />
-
-      <Header activeItem={0} />
-
-      {/* Pass the search prop to the Courses component */}
-      <Suspense>
-        <Courses search={search} />
-      </Suspense>
-
-      <Footer />
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "Courses - ByWay Learning Management System",
+  description:
+    "This is the courses page of ByWay e-learning platform where people can have access to resources for learning",
+  keywords: "Programming, MERN, TypeScript, ReactJs, NextJs, Web development",
 };
 
-export default Page;
+export default async function CoursesPage() {
+  return <Courses />;
+}

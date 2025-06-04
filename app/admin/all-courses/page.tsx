@@ -1,12 +1,12 @@
 "use client";
 
-import AdminSidebar from "../../components/Admin/AdminSidebar";
-import DashboardHeader from "../../components/Admin/DashboardHeader";
-import AdminProtected from "../../hooks/adminProtected";
-import Heading from "../../utils/Heading";
+import AdminSidebar from "../../../components/Admin/AdminSidebar";
+import DashboardHeader from "../../../components/Admin/DashboardHeader";
+import AdminProtected from "../../../hooks/adminProtected";
+import Heading from "../../../utils/Heading";
 import React, { useState, useEffect, FC } from "react";
 import { useSelector } from "react-redux";
-import AllCourses from "../../components/Admin/Course/AllCourses";
+import AllCourses from "../../../components/Admin/Course/AllCourses";
 import { useRefreshTokenQuery } from "../../../redux/api/apiSlice";
 import { useGetAllCoursesQuery } from "../../../redux/course/courseApi";
 

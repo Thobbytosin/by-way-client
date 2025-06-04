@@ -1,11 +1,11 @@
 "use client";
-import AdminSidebar from "../../components/Admin/AdminSidebar";
-import DashboardHeader from "../../components/Admin/DashboardHeader";
-import AdminProtected from "../../hooks/adminProtected";
-import Heading from "../../utils/Heading";
+import AdminSidebar from "../../../components/Admin/AdminSidebar";
+import DashboardHeader from "../../../components/Admin/DashboardHeader";
+import AdminProtected from "../../../hooks/adminProtected";
+import Heading from "../../../utils/Heading";
 import React, { useState, useEffect, FC } from "react";
 import { useSelector } from "react-redux";
-import AllUsers from "../../components/Admin/Users/AllUsers";
+import AllUsers from "../../../components/Admin/Users/AllUsers";
 import { useRefreshTokenQuery } from "../../../redux/api/apiSlice";
 
 type Props = {};

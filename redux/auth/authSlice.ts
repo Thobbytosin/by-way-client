@@ -1,8 +1,12 @@
-import { AuthState } from "@/app/types/user";
+import { AuthState } from "@/types/user";
 import { createSlice } from "@reduxjs/toolkit";
+import { PersistedState } from "redux-persist";
 
-const initialState: AuthState = {
+type CompleteAuthState = AuthState & { _persist: PersistedState };
+
+const initialState: CompleteAuthState = {
   user: null,
+  _persist: undefined,
 };
 
 const authSlice = createSlice({

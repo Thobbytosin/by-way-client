@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Heading from "../utils/Heading";
-import AdminProtected from "../hooks/adminProtected";
-import AdminSidebar from "../components/Admin/AdminSidebar";
-import DashboardHero from "../components/Admin/DashboardHero";
+import Heading from "../../utils/Heading";
+import AdminProtected from "../../hooks/adminProtected";
+import AdminSidebar from "../../components/Admin/AdminSidebar";
+import DashboardHero from "../../components/Admin/DashboardHero";
 import { useSelector } from "react-redux";
 import { useRefreshTokenQuery } from "../../redux/api/apiSlice";
 

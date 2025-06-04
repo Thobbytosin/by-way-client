@@ -5,10 +5,10 @@ import {
   useLoadUserQuery,
   useRefreshTokenQuery,
 } from "../../../redux/api/apiSlice";
-import CourseClass from "../../components/Course/Class/CourseClass";
+import CourseClass from "../../../components/Course/Class/CourseClass";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
-import Loader from "../../components/Loader/Loader";
+import Loader from "../../../components/Loader/Loader";
 import { useSelector } from "react-redux";
 import { useGetCourseContentDataQuery } from "@/redux/course/courseApi";
 

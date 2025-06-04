@@ -1,7 +1,19 @@
 import "./globals.css";
 import React from "react";
 import Script from "next/script";
-import AppProvider from "./providers/AppProvider";
+import AppProvider from "../providers/AppProvider";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ByWay Learning Management System",
+  description:
+    "This is an online e-learning platform where people can have access to resources for learning",
+  keywords: "Programming, MERN, TypeScript, ReactJs, NextJs, Web development",
+  icons: {
+    icon: "/logo.png", //Path relative to /public
+    shortcut: "/logo.png",
+  },
+};
 
 export default function RootLayout({
   children,
