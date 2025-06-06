@@ -23,7 +23,6 @@ import { RootState } from "@/redux/store";
 import { useUserQueries } from "@/hooks/api/user.api";
 import avatarFallback from "@/public/assets/avatar.png";
 import Image from "next/image";
-import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   course: Course | undefined;

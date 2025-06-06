@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { FC, useEffect, useState } from "react";
 import { CancelIcon } from "../../../icons/icons";
 import { Elements } from "@stripe/react-stripe-js";
@@ -10,6 +11,7 @@ import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Course } from "@/types/course";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+import InLineLoader from "@/components/Loader/InlineLoader";
 
 type Props = {
   open: boolean;
@@ -23,7 +25,11 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
   const router = useRouter();
   const [orderSuccessModal, setOrderSuccessModal] = useState(false);
   const { paymentIntentDomain } = useOrderMutations();
-  const { createPaymentIntent, data: clientSecret } = paymentIntentDomain;
+  const {
+    createPaymentIntent,
+    data: clientSecret,
+    paymentIntentError,
+  } = paymentIntentDomain;
   const { stripeKeyDomain } = useOrderQueries();
   const [stripePromise, setStripePromise] = useState<Stripe | null>(null);
   const { publishableKey } = stripeKeyDomain;
@@ -42,7 +48,12 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
     // create payment
     const amount = (course && Math.round(course?.price * 100)) || 0;
     createPaymentIntent({ amount });
-  }, [publishableKey]);
+
+    if (paymentIntentError) {
+      setOpen(false);
+      setLoading(false);
+    }
+  }, [publishableKey, createPaymentIntent, paymentIntentError]);
 
   return (
     <div className=" fixed left-0 top-0 w-screen h-screen bg-black bg-opacity-80 flex justify-center items-center z-[99]">
@@ -51,11 +62,11 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
           setLoading(false);
           setOpen(!open);
         }}
-        className=" w-full h-full bg-transparent fixed left-0 top-0 "
+        className=" w-full h-full bg-transparent fixed left-0 top-0 m-auto "
       />
       {/* Payment modal */}
-      {!orderSuccessModal && (
-        <div className=" min-w-[30%] min-h-fit p-4 bg-white  rounded-lg z-[99] m-auto">
+      {!orderSuccessModal ? (
+        <div className=" min-w-[30%] min-h-[40%] p-4 bg-white  rounded-lg z-[99] m-auto ">
           <div className=" w-full flex justify-end ">
             <div className=" text-black rounded-full">
               <CancelIcon
@@ -69,7 +80,7 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
               />
             </div>
           </div>
-          {stripePromise && clientSecret && (
+          {stripePromise && clientSecret ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutForm
                 course={course}
@@ -77,12 +88,12 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
                 setOrderSuccessModal={setOrderSuccessModal}
               />
             </Elements>
+          ) : (
+            <InLineLoader />
           )}
         </div>
-      )}
-
-      {/* payment success modal */}
-      {orderSuccessModal && (
+      ) : (
+        // {/* payment success modal */}
         <div className=" w-[85%] h-fit sm:w-[70%] p-5 sm:p-8 bg-white dark:bg-dimDark  rounded-lg z-[100] mx-auto absolute flex flex-col justify-start items-center ">
           <div className=" w-[60%] h-[60%] sm:w-[40%] sm:h-[40%] flex justify-center items-center">
             <Lottie animationData={successAnimation} loop={true} />
@@ -91,7 +102,7 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
             Order Completed
           </h1>
           <p className="text-[1rem] sm:text-[1.4rem] lg:text-[2rem] font-medium mt-3 text-center">
-            You Will Receive a confirmation email soon!{" "}
+            You will receive a confirmation email soon!{" "}
           </p>
           {/* button */}
           <button

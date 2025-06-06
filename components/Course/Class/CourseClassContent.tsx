@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   AccessTimeIcon,
   LockIcon,
@@ -9,350 +10,205 @@ import {
   StarRateIcon,
   VerifiedIcon,
   WorkspacePremiumIcon,
-} from "../../../icons/icons";
-import { styles } from "../../../styles/style";
-import CoursePlayer from "../../../utils/CoursePlayer";
-import { useLoadUserQuery } from "../../../redux/api/apiSlice";
-import {
-  useAddQuestionMutation,
-  useAddReplyToQuestionMutation,
-  useAddReplyToReviewMutation,
-  useAddReviewMutation,
-  useGetCourseContentDataQuery,
-  useGetCourseDetailsQuery,
-} from "../../../redux/course/courseApi";
-import {
-  useGetUserLatestQuery,
-  useUpdateUserVideosViewedMutation,
-} from "../../../redux/user/userApi";
+} from "@/icons/icons";
+import { styles } from "@/styles/style";
+import CoursePlayer from "@/utils/CoursePlayer";
 import React, { useEffect, FC, useState } from "react";
 import toast from "react-hot-toast";
 import SimpleLoader from "../../SimpleLoader/SimpleLoader";
 import { format } from "timeago.js";
-import Ratings from "../../../utils/Ratings";
+import Ratings from "@/utils/Ratings";
 import Image from "next/image";
-import congratulationsGif from "../../../../public/assets/congratulations.gif";
+import congratulationsGif from "@/../public/assets/congratulations.gif";
 import { useRouter } from "next/navigation";
-
-import socketID from "socket.io-client";
 import CourseClassContentList from "./CourseClassContentList";
 import { useSocketNotification } from "@/hooks/useSocketNotification";
+import { useUserMutations, useUserQueries } from "@/hooks/api/user.api";
+import { useCourseMutations, useCourseQueries } from "@/hooks/api/course.api";
+import avatarFallback from "@/public/assets/avatar.png";
+import { CourseData } from "@/types/course";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { LessonStatus } from "@/types/user";
 
 const subTags = ["Details", "Qs & As", "Reviews"];
 
 type Props = {
-  data: any;
-  activeVideo: number;
-  setActiveVideo: (activeVideo: number) => void;
-  setVisibleSection: (visibleSection: any) => void;
-  visibleSection: any;
-  setProgressCounter: (progress: number) => void;
-  progressCounter: number;
-  user: any;
+  data: CourseData[];
+  setActiveVideo: (value: CourseData | null) => void;
+  activeVideo: CourseData | null;
+  setActiveIndex: (value: number) => void;
+  activeIndex: number;
   courseId: string;
-  activeTag: number;
-  setActiveTag: (tag: number) => void;
-  admin: any;
+  courseData: CourseData[];
+  selectedCourse: LessonStatus | null;
+  setSelectedCourse: (value: LessonStatus | null) => void;
 };
 
 const CourseClassContent: FC<Props> = ({
   data,
   activeVideo,
   setActiveVideo,
-  setVisibleSection,
-  setProgressCounter,
-  progressCounter,
-  user,
+  activeIndex,
+  setActiveIndex,
   courseId,
-  activeTag,
-  setActiveTag,
-  admin,
-  visibleSection,
+  courseData,
+  selectedCourse,
+  setSelectedCourse,
 }) => {
-  // to set the active video in the array
-  // let [active, setActive] = useState<any>({});
-  const { emitNotification } = useSocketNotification();
-  const [showCompletedModal, setShowCompletedModal] = useState(true);
+  const { user } = useSelector((state: RootState) => state.auth);
+  // NEXT PACKAGES
   const router = useRouter();
+
+  // SOCKET IO
+  const { emitNotification } = useSocketNotification();
+
+  // API CALLS
+  const { adminDomainData } = useUserQueries({ type: "admin" });
+  const { admin } = adminDomainData;
+  const { userInfo } = useUserMutations();
+  const { updateViewedLesson } = userInfo;
+  const { usersDomainData } = useUserQueries({ type: "user-lists" });
+  const { usersList } = usersDomainData;
+  const { courseDomain } = useCourseQueries({
+    type: "auth-course",
+    courseId,
+  });
+  const { course } = courseDomain;
+  const { courseInfo, courseInfoPending, courseInfoSuccess } =
+    useCourseMutations(courseId);
+  const {
+    submitQuestion,
+    submitRepyToQuestion,
+    submitReview,
+    submitReviewReply,
+  } = courseInfo;
+  const {
+    submitQuestionPending,
+    submitRepyToQuestionPending,
+    submitReviewPending,
+    submitReviewReplyPending,
+  } = courseInfoPending;
+  const {
+    submitQuestionSuccess,
+    submitRepyToQuestionSuccess,
+    submitReviewSuccess,
+  } = courseInfoSuccess;
+
+  // INTIAL STATES
   const [rating, setRating] = useState(1);
-  const active = data[activeVideo];
   const [questionId, setQuestionId] = useState("");
   const [reviewId, setReviewId] = useState("");
-  const [updateUserVideosViewed, { data: videoViewedData, error }] =
-    useUpdateUserVideosViewedMutation();
-  const { refetch, data: userData } = useLoadUserQuery({});
-  const initialValues = {
+
+  // initial form values
+  const initialFormValues = {
     question: "",
-    contentId: active._id,
+    contentId: activeVideo?._id,
     courseId: courseId,
   };
   const initialReplyValues = {
     answer: "",
     questionId: questionId,
-    contentId: active._id,
+    contentId: activeVideo?._id,
     courseId: courseId,
   };
   const initialReviewValues = {
-    courseId: courseId,
     rating: rating,
     review: "",
   };
+
   const initialReplyReviewValues = {
-    courseId: courseId,
     reply: "",
     reviewId: reviewId,
   };
 
-  const [form, setForm] = useState(initialValues);
+  // STATES VARIABLES
+  const [activeTag, setActiveTag] = useState(0);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  // STATES FORMS
+  const [form, setForm] = useState(initialFormValues);
   const [replyForm, setReplyForm] = useState(initialReplyValues);
   const [reviewForm, setReviewForm] = useState(initialReviewValues);
   const [replyReviewForm, setReplyReviewForm] = useState(
     initialReplyReviewValues
   );
-  const [addQuestion, { isSuccess, error: questionError, isLoading }] =
-    useAddQuestionMutation();
-  const { refetch: courseContentRefetch } = useGetCourseContentDataQuery(
-    courseId,
-    {}
-  );
-  const [
-    addReplyToQuestion,
-    {
-      isSuccess: addReplySuccess,
-      error: addReplyError,
-      isLoading: addReplyLoading,
-    },
-  ] = useAddReplyToQuestionMutation();
-  const [showMore, setShowMore] = useState(false);
-  const { data: usersLatestData, refetch: refetchusersLatestData } =
-    useGetUserLatestQuery({});
-  const [
-    addReview,
-    {
-      isSuccess: addReviewSuccess,
-      error: addReviewError,
-      isLoading: addReviewLoading,
-    },
-  ] = useAddReviewMutation();
-  const [
-    addReplyToReview,
-    {
-      isSuccess: addReplyReviewSuccess,
-      error: addReplyReviewError,
-      isLoading: addReplyReviewLoading,
-    },
-  ] = useAddReplyToReviewMutation();
-  const { data: courseData, refetch: courseRefetch } =
-    useGetCourseDetailsQuery(courseId);
+
   const [showMoreReview, setShowMoreReview] = useState(false);
+
   // fetch user latest role
+
   const fetchUserLatestData = (userId: string) => {
-    const updatedUser = usersLatestData?.users?.filter(
-      (user: any) => user._id === userId
-    );
+    if (!usersList) return null;
+    const updatedUser = usersList?.filter((user: any) => user._id === userId);
 
     return {
-      role: updatedUser[0].role,
-      name: updatedUser[0].name,
-      avatar: updatedUser[0].avatar,
+      role: updatedUser?.[0]?.role,
+      name: updatedUser?.[0]?.name,
+      avatar: updatedUser?.[0]?.avatar,
     };
   };
 
-  // refetch the user latest data when page loads
-  useEffect(() => {
-    refetchusersLatestData();
-  }, [data]);
-
   // to update form contentId
   useEffect(() => {
-    setForm({ ...form, contentId: active._id });
-    setReplyForm({ ...replyForm, contentId: active._id });
-    setReviewForm({ ...reviewForm, rating: rating });
-  }, [active, rating]);
-
-  // for view videos
-  useEffect(() => {
-    if (videoViewedData) {
-      refetch(); // refetch user info anytime the user view a video
+    if (activeVideo) {
+      setForm({ ...form, contentId: activeVideo?._id });
+      setReplyForm({ ...replyForm, contentId: activeVideo?._id });
+      setReviewForm({ ...reviewForm, rating: rating });
     }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [videoViewedData, error]);
+  }, [activeVideo, rating]);
 
   // update questions in the course
   useEffect(() => {
-    if (isSuccess) {
-      courseContentRefetch();
-      toast.success("Question Submitted");
-      emitNotification({
-        title: "New Question Received",
-        message: `You have a new question in ${active.title} course.`,
-        userId: user?._id,
-      });
-    }
-
-    if (questionError) {
-      if ("data" in questionError) {
-        const errorData = questionError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, questionError]);
-
-  // update replies to questions
-  useEffect(() => {
-    if (addReplySuccess) {
-      courseContentRefetch();
-      toast.success("Answer Submitted");
-      // if the answer is not from an admin, send notification again
-      if (user?.role !== "admin") {
+    if (user) {
+      if (submitQuestionSuccess) {
         emitNotification({
-          title: "New Reply to Question Received",
-          message: `You have a new reply to a question in ${active.title} course.`,
+          title: "New Question Received",
+          message: `You have a new question in ${activeVideo?.title} course.`,
           userId: user?._id,
         });
       }
     }
+  }, [submitQuestionSuccess]);
 
-    if (addReplyError) {
-      if ("data" in addReplyError) {
-        const errorData = addReplyError as any;
-        toast.error(errorData.data.message);
+  // update replies to questions
+  useEffect(() => {
+    if (user) {
+      if (submitRepyToQuestionSuccess) {
+        // if the answer is not from an admin, send notification again
+        if (user?.role !== "admin") {
+          emitNotification({
+            title: "New Reply to Question Received",
+            message: `You have a new reply to a question in ${activeVideo?.title} course.`,
+            userId: user?._id,
+          });
+        }
       }
     }
-  }, [addReplySuccess, addReplyError]);
+  }, [submitRepyToQuestionSuccess]);
 
   // add review to course
   useEffect(() => {
-    if (addReviewSuccess) {
-      refetch(); // user info refresh
-      courseRefetch(); // refetch course
-      toast.success("Thanks for your feedback");
-      emitNotification({
-        title: "New Review Received",
-        message: `You have a new review in ${active.title} course.`,
-        userId: user?._id,
-      });
-    }
-
-    if (addReviewError) {
-      if ("data" in addReviewError) {
-        const errorData = addReviewError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [addReviewSuccess, addReviewError]);
-
-  // update replies to reviews
-  useEffect(() => {
-    if (addReplyReviewSuccess) {
-      courseRefetch();
-      toast.success("Reply Submitted");
-    }
-
-    if (addReplyReviewError) {
-      if ("data" in addReplyReviewError) {
-        const errorData = addReplyReviewError as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [addReplyReviewSuccess, addReplyReviewError]);
-
-  // go back to prev section
-  const prevSection = (section: string) => {
-    setActiveVideo(activeVideo === 0 ? 0 : activeVideo - 1);
-
-    {
-      section === active.videoSection &&
-        setVisibleSection((prevVisibleSections: any) => ({
-          ...prevVisibleSections,
-          [active.videoSection]: true,
-        }));
-    }
-  };
-
-  // go to next section
-
-  const nextSection = async (section: string) => {
-    // update active video
-    setActiveVideo(
-      activeVideo === data.length - 1 ? activeVideo : activeVideo + 1
-    );
-
-    // update active section
-    {
-      section === active.videoSection &&
-        setVisibleSection((prevVisibleSections: any) => ({
-          ...prevVisibleSections,
-          [active.videoSection]: true,
-        }));
-    }
-
-    // update progress counter
-    const correspondVideo = user?.courses?.filter(
-      (c: any) => c?.courseId === courseId
-    );
-    const filterVideo = correspondVideo[0]?.progress?.find(
-      (item: any) => item?.videoId === data[activeVideo]?._id
-    );
-
-    if (filterVideo) {
-      if (filterVideo?.viewed) {
-        return null;
-      } else {
-        await updateUserVideosViewed({
-          courseId,
-          videoId: filterVideo?.videoId,
+    if (user) {
+      if (submitReviewSuccess) {
+        emitNotification({
+          title: "New Review Received",
+          message: `You have a new review in ${activeVideo?.title} course.`,
+          userId: user?._id,
         });
       }
     }
-  };
+  }, [submitReviewSuccess]);
 
-  // finish course btn
-  const handleFinishCourse = async () => {
-    // update progress counter
-    const correspondVideo = user?.courses?.filter(
-      (c: any) => c?.courseId === courseId
-    );
-    const filterVideo = correspondVideo[0]?.progress?.find(
-      (item: any) => item?.videoId === data[activeVideo]?._id
-    );
-
-    if (filterVideo) {
-      if (filterVideo?.viewed) {
-        return null;
-      } else {
-        await updateUserVideosViewed({
-          courseId,
-          videoId: filterVideo?.videoId,
-        });
-      }
-    }
-  };
-
-  const activeCourseFromUsersCourses = userData?.user?.courses?.find(
-    (c: any) => c.courseId === courseId
-  );
-
-  const viewedVideo = activeCourseFromUsersCourses?.progress?.filter(
-    (v: any) => v.viewed === true
-  );
-
-  setProgressCounter(viewedVideo?.length);
-
-  // submit questions
+  // submit question
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     if (form.question.length === 0) {
       toast.error("Question cannot be empty");
     } else {
-      await addQuestion(form);
+      submitQuestion(form);
 
       setForm({ ...form, question: "" });
     }
@@ -365,7 +221,12 @@ const CourseClassContent: FC<Props> = ({
     if (reviewForm.review.length === 0) {
       toast.error("Review cannot be empty");
     } else {
-      await addReview(reviewForm);
+      submitReview(reviewForm);
+      // update UI
+
+      if (selectedCourse) {
+        setSelectedCourse({ ...selectedCourse, reviewed: true });
+      }
 
       setReviewForm({ ...reviewForm, review: "" });
     }
@@ -423,7 +284,7 @@ const CourseClassContent: FC<Props> = ({
     if (replyForm.answer.length === 0) {
       toast.error("Reply cannot be empty");
     } else {
-      await addReplyToQuestion(replyForm);
+      submitRepyToQuestion(replyForm);
 
       setReplyForm({ ...replyForm, answer: "" });
     }
@@ -449,49 +310,113 @@ const CourseClassContent: FC<Props> = ({
     if (replyReviewForm.reply.length === 0) {
       toast.error("Reply cannot be empty");
     } else {
-      await addReplyToReview(replyReviewForm);
+      submitReviewReply(replyReviewForm);
 
       setReplyReviewForm({ ...replyReviewForm, reply: "" });
     }
   };
 
-  // check if user has reviewed course
-  const checkIfUserHasReviewCourse = () => {
-    const course = user?.courses?.find((c: any) => c.courseId === courseId);
+  // next button
+  const handleNext = () => {
+    if (activeIndex < courseData.length - 1) {
+      const currentVideo = courseData[activeIndex];
 
-    return course.reviewed;
+      const hasBeenViewed = selectedCourse?.progress.find(
+        (c) => c.videoId === currentVideo._id
+      )?.viewed;
+
+      if (!hasBeenViewed) {
+        // update UI
+
+        if (selectedCourse) {
+          const updatedProgress = selectedCourse?.progress.map((p) =>
+            p.videoId === currentVideo._id ? { ...p, viewed: true } : p
+          );
+
+          setSelectedCourse({ ...selectedCourse, progress: updatedProgress });
+        }
+
+        // sent to backend
+        updateViewedLesson({ courseId, videoId: currentVideo._id });
+      }
+
+      const nextIndex = activeIndex + 1;
+      const nextVideo = courseData[nextIndex];
+      setActiveIndex(nextIndex);
+      setActiveVideo(nextVideo);
+    }
+  };
+
+  // prev button
+  const handlePrev = () => {
+    if (activeIndex > 0) {
+      const prevIndex = activeIndex - 1;
+      const prevVideo = courseData[prevIndex];
+      setActiveIndex(prevIndex);
+      setActiveVideo(prevVideo);
+    }
+  };
+
+  // finish course btn
+  const handleFinishCourse = () => {
+    const currentVideo = courseData[activeIndex];
+
+    const hasBeenViewed = selectedCourse?.progress.find(
+      (c) => c.videoId === currentVideo._id
+    )?.viewed;
+
+    if (!hasBeenViewed) {
+      // update UI
+
+      if (selectedCourse) {
+        const updatedProgress = selectedCourse?.progress.map((p) =>
+          p.videoId === currentVideo._id ? { ...p, viewed: true } : p
+        );
+
+        setSelectedCourse({ ...selectedCourse, progress: updatedProgress });
+      }
+
+      // sent to backend
+      updateViewedLesson({ courseId, videoId: currentVideo._id });
+
+      setShowCompletedModal(true);
+    }
   };
 
   return (
     <>
-      {active && (
+      {activeVideo && (
         <div
           className={`${styles.paddingLeft} ${styles.paddingY} w-full h-full  lg:col-span-7 col-span-10 `}
         >
           {/* video title */}
           <h2 className=" font-semibold text-[1rem] sm:text-[1.4rem] mb-6">
-            Lesson {activeVideo + 1}. {active.title}
+            Lesson {activeIndex + 1}. {activeVideo.title}
           </h2>
 
           {/* video player */}
 
-          <CoursePlayer key={active?._id} link={active?.videoUrl} isClass />
+          <CoursePlayer
+            key={activeVideo._id}
+            link={activeVideo.videoUrl}
+            isClass
+          />
 
           {/* buttons */}
           <div className=" w-full mt-5 flex justify-between items-center">
             {/* prev button */}
             <button
-              disabled={activeVideo === 0}
-              onClick={() => prevSection(active.videoSection)}
+              disabled={activeIndex === 0}
+              onClick={handlePrev}
               className={`${
-                activeVideo === 0 && "cursor-no-drop opacity-40"
+                activeIndex === 0 && "cursor-no-drop opacity-40"
               } text-xs sm:text-sm font-medium min-w-[8rem] px-4 text-center py-2 rounded-full bg-warning text-white`}
             >
               Previous Class
             </button>
 
             {/* finish course / next course btn */}
-            {activeVideo === data.length - 1 ? (
+            {activeIndex === data.length - 1 ? (
               <button
                 onClick={handleFinishCourse}
                 className={`text-xs sm:text-sm font-medium min-w-[8rem] text-center py-2 px-4 rounded-full bg-success text-white`}
@@ -500,7 +425,7 @@ const CourseClassContent: FC<Props> = ({
               </button>
             ) : (
               <button
-                onClick={() => nextSection(active.videoSection)}
+                onClick={handleNext}
                 className={`text-xs sm:text-sm min-w-[8rem] text-center py-2 px-4 rounded-full font-medium  bg-primary text-white`}
               >
                 Next Class
@@ -557,9 +482,11 @@ const CourseClassContent: FC<Props> = ({
                   {/* teacher avatar */}
                   <div className="flex items-center gap-3 mt-6">
                     <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-primary overflow-hidden">
-                      <img
-                        src={admin?.avatar?.url}
+                      <Image
+                        src={admin?.avatar?.url || avatarFallback}
                         alt="admin_image"
+                        width={100}
+                        height={100}
                         className=" w-full h-full object-cover"
                       />
                     </div>
@@ -590,16 +517,16 @@ const CourseClassContent: FC<Props> = ({
                 </div>
               </div>
 
-              <CourseClassContentList
+              {/* tablets and mobile */}
+              {/* <CourseClassContentList
                 data={data}
                 courseId={courseId}
+                activeIndex={activeIndex}
+                setActiveIndex={setActiveIndex}
                 activeVideo={activeVideo}
                 setActiveVideo={setActiveVideo}
-                visibleSection={visibleSection}
-                setVisibleSection={setVisibleSection}
-                progressCounter={progressCounter}
                 // hideForLargeTrue
-              />
+              /> */}
             </div>
           )}
 
@@ -608,19 +535,19 @@ const CourseClassContent: FC<Props> = ({
             <div className=" w-full border-t border-gray-300 dark:border-gray-800 mt-8 py-8">
               <h2 className={styles.detailsSubTagHeading}>Overview</h2>
               <p className={styles.detailsDescription}>
-                {active.videoDescription}
+                {activeVideo.videoDescription}
               </p>
 
               <br />
 
-              {active.objectives[0] && (
+              {activeVideo.objectives[0] && (
                 <h2 className={styles.detailsSubTagHeading}>
                   Learning Objectives
                 </h2>
               )}
 
-              {active.objectives[0] &&
-                active.objectives.map((objective: any, index: number) => (
+              {activeVideo.objectives[0] &&
+                activeVideo.objectives.map((objective: any, index: number) => (
                   <p key={index} className=" mt-4 flex gap-2 items-center">
                     <span className=" w-2 h-2 rounded-full bg-slate-900 dark:bg-slate-200" />
                     <span className={styles.detailsDescription}>
@@ -632,7 +559,7 @@ const CourseClassContent: FC<Props> = ({
               <br />
 
               <h2 className={styles.detailsSubTagHeading}>Resources</h2>
-              {active.links.map((link: any, index: number) => (
+              {activeVideo.links.map((link: any, index: number) => (
                 <a
                   key={index}
                   href={link.url}
@@ -656,9 +583,11 @@ const CourseClassContent: FC<Props> = ({
               <div className=" w-full gap-4 flex justify-between items-start mt-8">
                 {/* image */}
                 <div className="w-[2.8rem] h-[2.4rem] sm:w-[3.4rem] sm:h-[3rem] rounded-full border-2 border-primary overflow-hidden">
-                  <img
-                    src={user?.avatar?.url}
+                  <Image
+                    src={user?.avatar?.url || avatarFallback}
                     alt="admin_image"
+                    width={100}
+                    height={100}
                     className=" w-full h-full object-cover"
                   />
                 </div>
@@ -678,9 +607,9 @@ const CourseClassContent: FC<Props> = ({
                     onChange={(e: any) =>
                       setForm({ ...form, question: e.target.value })
                     }
-                    className={`${styles.inputStyle} mb-4`}
+                    className={`${styles.inputStyle} dark:bg-gray-900 bg-white text-sm mb-4`}
                   ></textarea>
-                  {isLoading ? (
+                  {submitQuestionPending ? (
                     <SimpleLoader isAdmin />
                   ) : (
                     <button className=" mt-4 bg-primary text-white px-8 py-3 rounded-full text-xs font-medium sm:text-sm">
@@ -693,19 +622,19 @@ const CourseClassContent: FC<Props> = ({
               <br />
 
               {/* DISCUSSIONS */}
-              {active?.questions[0] ? (
+              {activeVideo?.questions[0] ? (
                 <div className="w-full border-t border-gray-300 dark:border-gray-800 mt-8 py-8">
                   <h3 className={styles.detailsSubTagHeading}>
                     Join the discussion
                   </h3>
-                  {active.questions
-                    ?.slice(0, showMore ? active.questions.length : 6)
+                  {activeVideo.questions
+                    ?.slice(0, showMore ? activeVideo.questions.length : 6)
                     ?.map((question: any, i: number) => (
                       // each question content
                       <div
                         key={i}
                         className={`flex gap-2 items-start w-full  ${
-                          i === active.questions.length - 1
+                          i === activeVideo.questions.length - 1
                             ? "py-6"
                             : "py-6 border-b border-gray-200 dark:border-gray-800"
                         }`}
@@ -714,12 +643,14 @@ const CourseClassContent: FC<Props> = ({
 
                         {/* image profile */}
                         <div className=" w-[2.6rem] h-[2.3rem] rounded-full border-2 border-primary overflow-hidden">
-                          <img
+                          <Image
                             src={
-                              fetchUserLatestData(question?.user?._id).avatar
-                                .url
+                              fetchUserLatestData(question?.user?._id)?.avatar
+                                .url || avatarFallback
                             }
                             alt="admin_image"
+                            width={100}
+                            height={100}
                             className=" w-full h-full object-cover"
                           />
                         </div>
@@ -728,9 +659,9 @@ const CourseClassContent: FC<Props> = ({
                         <div className=" w-full">
                           <h4 className=" font-semibold flex items-center gap-2 text-sm">
                             <span>
-                              {fetchUserLatestData(question?.user?._id).name}
+                              {fetchUserLatestData(question?.user?._id)?.name}
                             </span>
-                            {fetchUserLatestData(question?.user?._id).role ===
+                            {fetchUserLatestData(question?.user?._id)?.role ===
                               "admin" && (
                               <span className=" text-[14px] text-primary">
                                 <VerifiedIcon fontSize="inherit" />
@@ -801,9 +732,9 @@ const CourseClassContent: FC<Props> = ({
                                     : ""
                                 }
                                 onChange={(e) => handleReplyChange(e, question)}
-                                className={`${styles.inputStyle} w-full`}
+                                className={`${styles.inputStyle} dark:bg-black bg-white w-full`}
                               ></textarea>
-                              {addReplyLoading ? (
+                              {submitRepyToQuestionPending ? (
                                 <SimpleLoader isAdmin />
                               ) : (
                                 <button
@@ -827,12 +758,14 @@ const CourseClassContent: FC<Props> = ({
                                   >
                                     {/* image profile */}
                                     <div className=" w-[1.6rem] h-[1.6rem] rounded-full border-2 border-success overflow-hidden">
-                                      <img
+                                      <Image
                                         src={
                                           fetchUserLatestData(reply?.user?._id)
-                                            .avatar.url
+                                            ?.avatar.url || avatarFallback
                                         }
                                         alt="admin_image"
+                                        width={100}
+                                        height={100}
                                         className=" w-full h-full object-cover"
                                       />
                                     </div>
@@ -843,11 +776,11 @@ const CourseClassContent: FC<Props> = ({
                                           {
                                             fetchUserLatestData(
                                               reply?.user?._id
-                                            ).name
+                                            )?.name
                                           }
                                         </span>
                                         {fetchUserLatestData(reply?.user?._id)
-                                          .role === "admin" && (
+                                          ?.role === "admin" && (
                                           <span className=" text-[14px] text-primary">
                                             <VerifiedIcon fontSize="inherit" />
                                           </span>
@@ -879,25 +812,26 @@ const CourseClassContent: FC<Props> = ({
               )}
 
               {/* SHOW MORE */}
-              {active?.questions[0] && active.questions.length > 3 && (
-                <>
-                  {!showMore ? (
-                    <button
-                      onClick={() => setShowMore((prev) => !prev)}
-                      className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black"
-                    >
-                      Show more
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowMore((prev) => !prev)}
-                      className=" text-primary underline font-medium text-sm sm:text-base  transition duration-300 hover:dark:text-white hover:text-black"
-                    >
-                      Show Less
-                    </button>
-                  )}
-                </>
-              )}
+              {activeVideo?.questions[0] &&
+                activeVideo.questions.length > 3 && (
+                  <>
+                    {!showMore ? (
+                      <button
+                        onClick={() => setShowMore((prev) => !prev)}
+                        className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black"
+                      >
+                        Show more
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowMore((prev) => !prev)}
+                        className=" text-primary underline font-medium text-sm sm:text-base  transition duration-300 hover:dark:text-white hover:text-black"
+                      >
+                        Show Less
+                      </button>
+                    )}
+                  </>
+                )}
             </div>
           )}
 
@@ -905,17 +839,17 @@ const CourseClassContent: FC<Props> = ({
           {activeTag === 2 && (
             <div className=" w-full border-t border-gray-300 dark:border-gray-800 mt-8 py-8">
               {/* heading */}
-              {!checkIfUserHasReviewCourse() && (
+              {!selectedCourse?.reviewed && (
                 <h3 className={styles.detailsSubTagHeading}>Post a review</h3>
               )}
 
               {/* check if user has already reviewed this course */}
 
-              {checkIfUserHasReviewCourse() ? (
+              {selectedCourse?.reviewed ? (
                 <p className="mb-10 sm:mb-20 text-base lg:text-lg">
                   Thanks for your feedback,{" "}
                   <span className=" text-primary font-medium">
-                    {user.name}.
+                    {user?.name}.
                   </span>
                 </p>
               ) : (
@@ -923,9 +857,11 @@ const CourseClassContent: FC<Props> = ({
                 <div className=" flex gap-4 items-start mt-6 mb-20">
                   {/* image */}
                   <div className=" w-[2.6rem h-[2.3rem] sm:w-[3.4rem] sm:h-[3rem] rounded-full border-2 border-primary overflow-hidden">
-                    <img
-                      src={user?.avatar?.url}
+                    <Image
+                      src={user?.avatar?.url || avatarFallback}
                       alt="admin_image"
+                      width={100}
+                      height={100}
                       className=" w-full h-full object-cover"
                     />
                   </div>
@@ -965,7 +901,7 @@ const CourseClassContent: FC<Props> = ({
                         name="review"
                         cols={30}
                         rows={3}
-                        placeholder="Post a reiview about this course..."
+                        placeholder="Post a review about this course..."
                         value={reviewForm.review}
                         onChange={(e: any) =>
                           setReviewForm({
@@ -973,9 +909,9 @@ const CourseClassContent: FC<Props> = ({
                             review: e.target.value,
                           })
                         }
-                        className={`${styles.inputStyle} mb-4 w-full`}
+                        className={`${styles.inputStyle} dark:bg-gray-900 bg-white text-sm mb-4 w-full`}
                       ></textarea>
-                      {addReviewLoading ? (
+                      {submitReviewPending ? (
                         <SimpleLoader isAdmin />
                       ) : (
                         <button className=" mt-4 bg-primary text-white px-8 py-3 rounded-full">
@@ -997,19 +933,16 @@ const CourseClassContent: FC<Props> = ({
                 <div className="sm:min-w-[20rem] w-full ">
                   <div className=" flex items-center">
                     <Ratings
-                      rating={courseData?.course?.ratings}
+                      rating={course?.ratings || 0}
                       color="text-[#EAB308]"
                     />
                     <h2>
                       <span className="font-semibold text-2xl sm:text-3xl ml-2">
-                        {(courseData?.course?.ratings).toFixed(1)}
+                        {(course?.ratings || 0).toFixed(1)}
                       </span>
                       <span className="ml-3 text-sm sm:text-base font-normal">
-                        ({courseData?.course?.reviews?.length}{" "}
-                        {courseData?.course?.reviews?.length === 1
-                          ? "review"
-                          : "reviews"}
-                        )
+                        ({course?.reviews?.length}{" "}
+                        {course?.reviews?.length === 1 ? "review" : "reviews"})
                       </span>
                     </h2>
                   </div>
@@ -1052,27 +985,22 @@ const CourseClassContent: FC<Props> = ({
                 {/* right */}
                 <div className=" w-full">
                   {/* when there is no review yet */}
-                  {!courseData?.course?.reviews[0] && (
+                  {!course?.reviews[0] && (
                     <h3 className={"font-medium text-xl ml-10 "}>
                       No review yet.
                     </h3>
                   )}
 
                   {/* when there is a review */}
-                  {courseData?.course?.reviews[0] && (
+                  {course?.reviews[0] && (
                     <div className="h-fit w-full bg-gray-200 dark:bg-gray-900 rounded-lg">
-                      {courseData?.course?.reviews
-                        ?.slice(
-                          0,
-                          showMoreReview
-                            ? courseData?.course?.reviews.length
-                            : 5
-                        )
+                      {course?.reviews
+                        ?.slice(0, showMoreReview ? course?.reviews.length : 5)
                         ?.map((review: any, i: number) => (
                           <div
                             key={i}
                             className={`w-full ${
-                              i === courseData?.course?.reviews.length - 1
+                              i === course?.reviews.length - 1
                                 ? "sm:p-10 p-5"
                                 : "sm:p-10 p-5 border-b border-gray-400"
                             }`}
@@ -1085,7 +1013,7 @@ const CourseClassContent: FC<Props> = ({
                                   <Image
                                     src={
                                       fetchUserLatestData(review?.user?._id)
-                                        .avatar.url
+                                        ?.avatar?.url || avatarFallback
                                     }
                                     width={200}
                                     height={200}
@@ -1099,11 +1027,11 @@ const CourseClassContent: FC<Props> = ({
                                     <span>
                                       {
                                         fetchUserLatestData(review?.user?._id)
-                                          .name
+                                          ?.name
                                       }
                                     </span>
                                     {fetchUserLatestData(review?.user?._id)
-                                      .role === "admin" && (
+                                      ?.role === "admin" && (
                                       <span className=" text-[14px] text-primary">
                                         <VerifiedIcon fontSize="inherit" />
                                       </span>
@@ -1206,7 +1134,7 @@ const CourseClassContent: FC<Props> = ({
                                     }
                                     className={`${styles.inputStyle} w-full`}
                                   ></textarea>
-                                  {addReplyReviewLoading ? (
+                                  {submitReviewReplyPending ? (
                                     <SimpleLoader isAdmin />
                                   ) : (
                                     <button
@@ -1231,12 +1159,14 @@ const CourseClassContent: FC<Props> = ({
                                     >
                                       {/* image profile */}
                                       <div className=" w-[1.6rem] h-[1.6rem] rounded-full border-2 border-success overflow-hidden">
-                                        <img
+                                        <Image
                                           src={
                                             fetchUserLatestData(
                                               reply?.user?._id
-                                            ).avatar.url
+                                            )?.avatar.url || avatarFallback
                                           }
+                                          width={100}
+                                          height={100}
                                           alt="admin_image"
                                           className=" w-full h-full object-cover"
                                         />
@@ -1247,11 +1177,11 @@ const CourseClassContent: FC<Props> = ({
                                             {
                                               fetchUserLatestData(
                                                 reply?.user?._id
-                                              ).name
+                                              )?.name
                                             }{" "}
                                           </span>
                                           {fetchUserLatestData(reply?.user?._id)
-                                            .role === "admin" && (
+                                            ?.role === "admin" && (
                                             <span className=" text-[14px] text-primary">
                                               <VerifiedIcon fontSize="inherit" />
                                             </span>
@@ -1276,26 +1206,25 @@ const CourseClassContent: FC<Props> = ({
                   )}
 
                   {/* SHOW MORE / SHOW LESS REVIEWS*/}
-                  {courseData?.course?.reviews[0] &&
-                    courseData?.course?.reviews.length > 5 && (
-                      <>
-                        {!showMoreReview ? (
-                          <button
-                            onClick={() => setShowMoreReview((prev) => !prev)}
-                            className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black mt-4"
-                          >
-                            Show more
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => setShowMoreReview((prev) => !prev)}
-                            className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black mt-4"
-                          >
-                            Show Less
-                          </button>
-                        )}
-                      </>
-                    )}
+                  {course?.reviews[0] && course?.reviews.length > 5 && (
+                    <>
+                      {!showMoreReview ? (
+                        <button
+                          onClick={() => setShowMoreReview((prev) => !prev)}
+                          className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black mt-4"
+                        >
+                          Show more
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setShowMoreReview((prev) => !prev)}
+                          className=" text-primary underline font-medium text-sm sm:text-base transition duration-300 hover:dark:text-white hover:text-black mt-4"
+                        >
+                          Show Less
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -1303,7 +1232,7 @@ const CourseClassContent: FC<Props> = ({
 
           {/* COMPLETED MODAL */}
           {/* if user has finish course */}
-          {showCompletedModal && progressCounter === data?.length && (
+          {showCompletedModal && (
             <div className="  fixed left-0 top-0 w-screen h-screen bg-transparent z-[99] flex justify-center items-center">
               <div
                 onClick={() => setShowCompletedModal(false)}
@@ -1313,6 +1242,8 @@ const CourseClassContent: FC<Props> = ({
                 <Image
                   src={congratulationsGif}
                   alt="completed"
+                  width={100}
+                  height={100}
                   className=" lg:w-[50%]"
                 />
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-center mt-6">

@@ -95,7 +95,7 @@ export const useAuthMutations = () => {
     url: SOCIALLOGIN,
     skipAuthRefresh: true,
     onSuccess: (response) => {
-      toast.success("Login successfully");
+      toast.success(response.message);
 
       dispatch(setUser(response.data?.user));
 
@@ -124,6 +124,8 @@ export const useAuthMutations = () => {
       if (!response.success) return;
 
       toast.success(response.message);
+
+      router.push("/");
 
       dispatch(setUser(null));
 

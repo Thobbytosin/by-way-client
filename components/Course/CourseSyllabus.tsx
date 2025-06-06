@@ -2,15 +2,8 @@ import {
   KeyboardArrowDownIcon,
   KeyboardArrowUpIcon,
   OndemandVideoIcon,
-} from "../../icons/icons";
+} from "@/icons/icons";
 import React, { useState } from "react";
-
-interface StudentData {
-  department: string;
-  student: string;
-  courses: number;
-  level: number;
-}
 
 type Props = {
   content: any;

@@ -1,6 +1,6 @@
-import { BannerContent } from "@/types/content";
 import Image from "next/image";
 import React, { FC } from "react";
+import fallback from "@/public/assets/banner1.png";
 
 type Props = {
   hero:
@@ -45,7 +45,7 @@ const Hero: FC<Props> = ({ hero }) => {
           alt="banner_image"
           height={200}
           width={200}
-          className=" w-[100%]"
+          className=" w-full h-full object-cover"
         />
       </div>
     </div>

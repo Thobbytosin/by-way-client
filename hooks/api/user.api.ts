@@ -6,6 +6,7 @@ import {
   UPDATEAVATAR,
   UPDATEUSERINFO,
   UPDATEUSERPASSWORD,
+  UPDATEVIEWEDLESSON,
 } from "@/config/user.endpoints";
 import { TUser, UserDetail } from "@/types/user";
 import { useMutateData } from "./useApi";
@@ -119,8 +120,33 @@ export const useUserMutations = () => {
       },
     });
 
+  // update User viewed courses
+  const { mutate: updateViewedLesson, isSuccess: updateViewedLessonSuccess } =
+    useMutateData<null, { courseId: string; videoId: string }>({
+      method: "PUT",
+      mutationKey: ["update-user-viewed-courses"],
+      url: UPDATEVIEWEDLESSON,
+      skipAuthRefresh: false,
+      onSuccess: (response) => {
+        if (!response.success) return;
+
+        toast.success(response.message);
+
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      },
+      onError: (error) => {
+        toast.error(`${error.message}`);
+      },
+    });
+
   return {
     infoLoading: { updateAvatarPending, updatePasswordPending },
-    userInfo: { updateUser, updatePassword, updateProfilePicture },
+    userInfo: {
+      updateUser,
+      updatePassword,
+      updateProfilePicture,
+      updateViewedLesson,
+    },
+    userInfoSuccess: { updateViewedLessonSuccess },
   };
 };

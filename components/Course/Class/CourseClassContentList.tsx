@@ -1,255 +1,199 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   CheckIcon,
   KeyboardArrowDownIcon,
   KeyboardArrowUpIcon,
+  LockIcon,
   OndemandVideoIcon,
-} from "../../../icons/icons";
-import { useLoadUserQuery } from "../../../redux/api/apiSlice";
+} from "@/icons/icons";
 import Image from "next/image";
 import React, { FC, useState, useEffect } from "react";
 import "react-circular-progressbar/dist/styles.css";
-import successGif from "../../../../public/assets/completed.gif";
+import successGif from "@/public/assets/completed.gif";
+import { CourseData } from "@/types/course";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { SectionGroup } from "@/app/course-class/[id]/page";
+import { LessonStatus } from "@/types/user";
+import { contentTotalDuration } from "@/utils/helpers";
 
 type Props = {
-  data: any[];
-  activeVideo: number;
-  setActiveVideo: (video: number) => void;
-  visibleSection: any;
-  setVisibleSection: (visibleSection: any) => void;
-  progressCounter: number;
+  groupedSections: SectionGroup[];
+  courseData: CourseData[];
+  setActiveVideo: (value: CourseData | null) => void;
+  activeVideo: CourseData | null;
+  setActiveIndex: (value: number) => void;
+  activeIndex: number;
+  selectedCourse: LessonStatus | null;
   hideForLargeTrue?: boolean;
-  courseId: string;
 };
 
 const CourseClassContentList: FC<Props> = ({
-  data,
-  activeVideo,
+  courseData,
+  activeIndex,
+  setActiveIndex,
   setActiveVideo,
-  visibleSection,
-  setVisibleSection,
-  progressCounter,
+  activeVideo,
   hideForLargeTrue,
-  courseId,
+  selectedCourse,
+  groupedSections,
 }) => {
-  const { data: userData } = useLoadUserQuery({});
-  let [active, setActive] = useState<any>({});
-
-  const activeCourseFromUsersCourses: any = userData?.user?.courses?.find(
-    (c: any) => c.courseId === courseId
-  );
-
-  const notViewedVideo: any = activeCourseFromUsersCourses?.progress?.find(
-    (v: any) => v.viewed === false
-  );
-
-  const findUserViewedVideo = activeCourseFromUsersCourses?.progress?.filter(
-    (v: any) => v.viewed === true
-  );
-
-  useEffect(() => {
-    const activeLastNotViewedVideoIndex: number = data?.findIndex(
-      (av: any) => av._id === notViewedVideo?.videoId
-    );
-
-    // setActiveVideo(activeLastNotViewedVideoIndex);
-    // active = data[activeVideo];
-    if (activeLastNotViewedVideoIndex >= 0) {
-      // means there is 1 or more video not viewed yet
-      setActiveVideo(activeLastNotViewedVideoIndex);
-    } else {
-      // active = data[data.length - 1];
-      // means all videos are viewed
-      setActiveVideo(data.length - 1);
-    }
-  }, []);
-
-  // if (activeLastNotViewedVideoIndex >= 0) {
-  //   // means there is 1 or more video not viewed yet
-  //   active = data[activeLastNotViewedVideoIndex];
-  // } else {
-  //   active = data[data.length - 1];
-  // }
-
-  // useEffect(() => {
-  //   active = data[activeVideo];
-  // }, [activeVideo]);
-
-  const videoSections = Array.from(
-    new Set(data?.map((item: any) => item.videoSection))
-  );
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({});
 
   const toggleSection = (section: string) => {
-    setVisibleSection((prevVisibleSections: any) => ({
-      ...prevVisibleSections,
-      [section]: !prevVisibleSections[section],
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
     }));
   };
 
-  const contentTotalDuration = (duration: number) => {
-    const hours = Math.floor(duration / 3600);
-    const minutes = Math.ceil((duration % 3600) / 60);
+  const isSectionLocked = (section: string) => {
+    const currentSection = groupedSections.find(
+      (g) => g.sectionTitle === section
+    );
+    if (!currentSection) return false;
 
-    // Return formatted time
-    return `${
-      hours >= 1
-        ? `${hours === 1 ? `${hours} hr.` : `${hours} hr.`} ${
-            minutes < 1
-              ? ""
-              : `${minutes === 1 ? `${minutes} min.` : `${minutes} min.`}`
-          } `
-        : duration < 60
-        ? `${duration} sec.`
-        : `${minutes} min.`
-      // : `${minutes} min.`
-    }`;
+    const sectionIndex = groupedSections.findIndex(
+      (g) => g.sectionTitle === section
+    );
+
+    for (let i = 0; i < sectionIndex; i++) {
+      const prev = groupedSections[i];
+      const completed = prev.videos.every(
+        (video) =>
+          selectedCourse?.progress.find((p) => p.videoId === video._id)?.viewed
+      );
+      if (!completed) return true;
+    }
+
+    return false;
   };
 
-  // find id from data
-  const findIfFromParent = (item: any) => {
-    const id = data?.findIndex((it: any) => item._id === it._id);
+  const totalVideos = selectedCourse?.progress.length ?? 0;
 
-    return id;
-  };
+  const viewedCount =
+    selectedCourse?.progress.filter((p) => p.viewed).length ?? 0;
 
-  const calcProgessPercent = () => {
-    const progessCount = (progressCounter / data.length) * 100;
-
-    return Math.floor(progessCount);
-  };
-
-  // 199480
-
-  // set active content video
-  active = data[activeVideo];
+  const completionPercentage = Math.round((viewedCount / totalVideos) * 100);
 
   return (
     <>
-      {active && (
+      {activeVideo && (
         <div
           className={`${
             hideForLargeTrue ? "hidden lg:block mt-[8.5rem]" : "mt-0"
           } w-full h-fit bg-[#E2E8F0] dark:bg-[#0B1739] rounded-lg sm:rounded-xl lg:col-span-3 col-span-10 mx-auto sm:pt-3 pt-1`}
         >
-          <div className="my-6 px-6 flex items-center w-full justify-between">
-            <h2 className=" text-[0.88rem] sm:text-[1rem] font-semibold">
-              {progressCounter === data?.length ? (
-                <span className=" text-success">Course Completed!</span>
-              ) : (
-                <span>Course Completion</span>
-              )}
-            </h2>
+          <div className="mb-4 pt-6 px-6 flex items-center w-full justify-between">
+            {/* <h2 className=" text-[0.88rem] sm:text-[1rem] font-semibold">
+              Course Progress
+            </h2> */}
 
-            <div className=" flex items-center gap-3">
-              {/* <div className=" w-[35px] h-[35px] lg:w-[50px] lg:h-[50px]">
-                <CircularProgressbar
-                  value={calcProgessPercent()}
-                  text={`${calcProgessPercent()}%`}
-                  styles={{
-                    path: {
-                      stroke: `rgba(35, 189, 238, ${
-                        calcProgessPercent() / 100
-                      })`,
-                    },
-                    // Customize the text
-                    text: {
-                      // Text color
-                      fill: "#23BDEE",
-                      // Text size
-                      fontSize: "22px",
-                      fontWeight: "bold",
-                    },
-                    // Customize background - only used when the `background` prop is true
-                    background: {
-                      fill: "#23BDEE",
-                    },
-                  }}
-                />
-              </div> */}
-
-              <p
-                className={`text-xs sm:text-sm font-semibold ${
-                  progressCounter === data?.length ? "text-primary" : ""
-                }`}
-              >
-                {progressCounter === data?.length ? (
-                  <Image src={successGif} alt="completed" className=" w-10" />
-                ) : (
-                  `${progressCounter} out of ${data.length}`
-                )}
-              </p>
-            </div>
-          </div>
-          <>
-            {videoSections?.map((section: any, i) => (
+            <div className=" basis-1/2 bg-gray-500 dark:bg-black rounded-full h-2">
               <div
-                key={i}
-                className={`p-4 
-                   w-full `}
-              >
-                <div className=" cursor-pointer w-full gap-3 flex justify-between items-center">
-                  <h4
-                    className="w-full font-semibold text-sm sm:text-base pb-4 mb-4 border-b-2 border-gray-300 dark:border-gray-800"
-                    onClick={() => toggleSection(section)}
-                  >
-                    {visibleSection[section] ? (
-                      <KeyboardArrowUpIcon fontSize="inherit" />
+                className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${completionPercentage}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-700 dark:text-white font-semibold">
+              {completionPercentage}% completed
+            </p>
+          </div>
+
+          {groupedSections?.map((section, index) => {
+            // check if section is expanded
+            const expanded = expandedSections[section.sectionTitle] ?? true;
+            // check if section is locked
+            const locked = isSectionLocked(section.sectionTitle);
+
+            return (
+              <div key={index} className=" px-3 my-6 ">
+                <div
+                  onClick={() => toggleSection(section.sectionTitle)}
+                  className=" bg-white dark:bg-black flex justify-between items-center mb-4 p-2 cursor-pointer"
+                >
+                  <h3 className=" font-medium text-xs text-red-600 dark:text-primary">
+                    {index + 1}. {section.sectionTitle}
+                  </h3>
+                  <span className=" text-gray-900 dark:text-white">
+                    {expanded ? (
+                      <KeyboardArrowUpIcon color="inherit" fontSize="small" />
+                    ) : locked ? (
+                      <LockIcon color="inherit" fontSize="small" />
                     ) : (
-                      <KeyboardArrowDownIcon fontSize="inherit" />
-                    )}{" "}
-                    {i + 1}. {section}
-                  </h4>
+                      <KeyboardArrowDownIcon color="inherit" fontSize="small" />
+                    )}
+                  </span>
                 </div>
 
-                {visibleSection[section] && (
-                  <ul className=" bg-white dark:bg-black mt-2 rounded-lg">
-                    {data
-                      ?.filter(
-                        (s: any, dataIndex: number) =>
-                          s.videoSection === section
-                      )
-                      .map((item: any, index: number) => (
-                        <li
-                          onClick={() => {
-                            const id = data?.findIndex(
-                              (it: any) => item._id === it._id
-                            );
+                {/* videos in a section */}
+                {expanded && (
+                  <div className=" space-y-2">
+                    {section.videos.map((video, i) => {
+                      // find current lesson index from the course data
+                      const lessonIndex = courseData?.findIndex(
+                        (c) => c._id === video._id
+                      );
 
-                            return setActiveVideo(id);
-                          }}
-                          key={index}
-                          className={`py-4 px-3 hover:text-white hover:dark:text-black hover:bg-gray-900 hover:dark:bg-gray-100 transition duration-300 cursor-pointer rounded-lg ${
-                            index > 0
-                              ? "border-t border-gray-300 dark:border-gray-800"
-                              : "border-none"
-                          } ${
-                            active?._id === item._id &&
-                            "bg-gray-900 text-white dark:bg-gray-100 dark:text-black"
+                      // check current lesson progress from users history
+                      const progress = selectedCourse?.progress.find(
+                        (c) => c.videoId === video._id
+                      );
+
+                      const isActive = lessonIndex === activeIndex;
+                      const isViewed = progress?.viewed;
+
+                      return (
+                        <div
+                          key={i}
+                          className={` p-2 rounded-md r ${
+                            isActive
+                              ? "bg-gray-900 text-white dark:bg-gray-100 dark:text-black cursor-pointe"
+                              : locked
+                              ? "hover:bg-gray-400 hover:dark:bg-black transition duration-700 cursor-not-allowed"
+                              : "  hover:bg-gray-400 hover:dark:bg-black transition duration-700 cursor-pointer"
                           }`}
+                          onClick={() => {
+                            if (!locked) {
+                              setActiveIndex(lessonIndex);
+                              setActiveVideo(video);
+                            }
+                          }}
                         >
                           <div className=" flex items-center ">
-                            {/* check */}
+                            {/* checkmark */}
                             <div
-                              className={`text-[12px] w-5 h-5 rounded-[4px] ${
-                                active?._id === item._id &&
-                                "bg-primary border-none text-white"
+                              className={`${
+                                isActive
+                                  ? "bg-primary border-none text-white"
+                                  : ""
                               } ${
-                                progressCounter > findIfFromParent(item) &&
-                                "bg-primary border-none text-white"
-                              }  border border-gray-800 flex justify-center items-center`}
+                                isViewed
+                                  ? "bg-primary border-none text-white"
+                                  : ""
+                              } text-[12px] w-5 h-5 rounded-[4px] ${
+                                locked
+                                  ? "border-none text-gray-500"
+                                  : "border border-gray-800"
+                              }   flex justify-center items-center`}
                             >
-                              <CheckIcon fontSize="inherit" />
+                              {locked ? (
+                                <LockIcon fontSize="small" color="inherit" />
+                              ) : (
+                                <CheckIcon fontSize="inherit" />
+                              )}
                             </div>
 
-                            {/* title */}
-                            <p className=" font-medium max-w-[250px] text-xs -mt-2 ml-4">
-                              {findIfFromParent(item) + 1}. {item.title}
+                            <p className=" font-medium max-w-[250px] text-xs  ml-4">
+                              {lessonIndex + 1}. {video.title}
                             </p>
                           </div>
 
-                          {/* video duration */}
-                          <div className=" flex items-center justify-end mt-2 gap-1 text-primary">
+                          <div className=" flex items-center justify-end  gap-1 text-primary">
                             <p className=" text-gray-500 text-[12px]">
-                              {contentTotalDuration(item.videoDuration)}
+                              {contentTotalDuration(video.videoDuration)}
                             </p>
 
                             <OndemandVideoIcon
@@ -257,13 +201,14 @@ const CourseClassContentList: FC<Props> = ({
                               fontSize="small"
                             />
                           </div>
-                        </li>
-                      ))}
-                  </ul>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-            ))}
-          </>
+            );
+          })}
         </div>
       )}
     </>

@@ -11,9 +11,7 @@ const CoursePlayer: FC<Props> = ({ isClass, link }) => {
 
   return (
     <div
-      className={`${
-        isClass ? "lg:h-[70vh] sm:h-[50vh] h-[40vh]" : " h-[200px]  w-full"
-      }`}
+      className={`${isClass ? "h-[400px] w-full" : " h-[200px]  w-full"}`}
       style={{
         // height: isClass ? "70vh" : "30vh",
         // width: "100%",

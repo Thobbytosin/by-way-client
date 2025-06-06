@@ -10,9 +10,7 @@ const Logout: FC<Props> = () => {
   const handleLogout = async () => {
     try {
       logoutUser(null);
-      await signOut({
-        callbackUrl: "/",
-      });
+      await signOut(); // signout from google too
     } catch (error) {}
   };
 

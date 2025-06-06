@@ -14,6 +14,7 @@ export type Comment = {
 };
 
 export type CourseData = {
+  _id: string;
   title: string;
   description: string;
   videoUrl: string;
@@ -49,6 +50,6 @@ export type Course = {
 };
 
 export type CourseQueryOptions = {
-  type: "free-list" | "auth-course" | "free-course";
+  type: "free-list" | "auth-course" | "free-course" | "course-content";
   courseId?: string;
 };

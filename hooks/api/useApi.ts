@@ -62,6 +62,7 @@ interface MutationOptions<TResponse, TRequest = unknown> {
   mutationKey: (string | number)[];
   url: string;
   method: "POST" | "PUT" | "DELETE";
+  params?: string;
   headers?: Record<string, string>;
   skipAuthRefresh?: boolean;
   onSuccess: (data: ApiResponse<TResponse>) => void;
@@ -74,6 +75,7 @@ export function useMutateData<TResponse, TRequest = unknown>({
   headers,
   mutationKey,
   skipAuthRefresh = true,
+  params,
   onSuccess,
   onError,
 }: MutationOptions<TResponse, TRequest>) {
@@ -82,7 +84,7 @@ export function useMutateData<TResponse, TRequest = unknown>({
     mutationFn: async (data: TRequest) => {
       const config = {
         method,
-        url: `${SERVER_URI}${url}`,
+        url: params ? `${SERVER_URI}${url}${params}` : `${SERVER_URI}${url}`,
         data,
         withCredentials: true,
         headers: headers || {},

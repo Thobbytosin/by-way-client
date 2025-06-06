@@ -35,7 +35,7 @@ export const useServerStatus = (options?: { checkInterval?: number }) => {
 
         wasOfflineRef.current = false;
 
-        // window.location.reload();
+        window.location.reload();
       }
 
       consecutiveChecksRef.current++; // increase consecutive success check by 1

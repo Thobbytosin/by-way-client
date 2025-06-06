@@ -17,12 +17,12 @@ const CourseDetailsPage: FC<Props> = ({ id }) => {
     type: "free-course",
     courseId: id,
   });
-  const { course, courseLoading, courseFetching } = courseFreeDomain;
+  const { course, courseLoading } = courseFreeDomain;
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
 
-  if (courseLoading || courseFetching) {
+  if (courseLoading) {
     return <Loader key={"loading"} />;
   }
 
