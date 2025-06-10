@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { FETCHUSER } from "@/config/user.endpoints";
 import { useServerStatus } from "./useServerStatus";
 import { TUser } from "@/types/user.types";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 // AUTH GET REQUEST
 export const useAuth = () => {
@@ -46,7 +47,7 @@ export const useAuth = () => {
 // AUTH POST/PUT REQUESTS
 export const useAuthMutations = () => {
   const dispatch = useDispatch();
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   const queryClient = useQueryClient();
 
   // login user
@@ -68,7 +69,7 @@ export const useAuthMutations = () => {
 
       dispatch(setUser(response.data?.user));
 
-      router.push("/");
+      navigate("/");
 
       localStorage.setItem(
         "access_token_expiry",
@@ -96,7 +97,7 @@ export const useAuthMutations = () => {
 
       dispatch(setUser(response.data?.user));
 
-      router.push("/");
+      navigate("/");
 
       localStorage.setItem(
         "access_token_expiry",
@@ -122,7 +123,7 @@ export const useAuthMutations = () => {
 
       toast.success(response.message);
 
-      router.push("/");
+      navigate("/");
 
       dispatch(setUser(null));
 

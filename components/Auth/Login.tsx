@@ -44,10 +44,9 @@ const Login = (props: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
   const { data: nextAuthData } = useSession();
-  const { mutate: loginUser, isPending: loginUserLoading } = useLoginMutation();
+  // const { mutate: loginUser, isPending: loginUserLoading } = useLoginMutation();
   const { loginDomain, socialLoginUser } = useAuthMutations();
-  // const { loginUser, loginUserLoading } = loginDomain;
-  // const { loginUser, loginUserLoading } = loginDomain;
+  const { loginUser, loginUserLoading } = loginDomain;
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
