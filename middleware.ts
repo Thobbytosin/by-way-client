@@ -1,34 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedPaths = ["/profile", "/course-class", "/admin"];
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const access_token = request.cookies.get("access_Token")?.value;
+  const access_Token = request.cookies.get("access_Token")?.value;
 
   console.log("Path:", pathname);
-  console.log("Token exists:", Boolean(access_token));
+  console.log("Token exists:", Boolean(access_Token));
 
-  // run check only on the selected routes
-  const isProtected = protectedPaths.some((route) =>
+  const isProtected = ["/profile", "/course-class", "/admin"].some((route) =>
     pathname.startsWith(route)
   );
 
-  if (!isProtected) {
-    return NextResponse.next(); // continue if the route is not part of the protected routes
-  }
-
-  //   get access token
-  const access_Token = request.cookies.get("access_Token")?.value;
+  if (!isProtected) return NextResponse.next();
 
   if (!access_Token) {
-    // redirect to home page if there is no token
     const homeUrl = new URL("/", request.url);
-    // homeUrl.searchParams.set("authError", "true");
-
     return NextResponse.redirect(homeUrl);
   }
 
-  // if there is token, user can proceed
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: [
+    "/profile/:path*",
+    "/course-class/:path*",
+    "/admin",
+    "/admin/:path*",
+  ],
+};
