@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const access_Token = request.cookies.get("access_Token")?.value;
+  const access_Token =
+    request.headers.get("x-refresh-token") ||
+    request.cookies.get("access_Token")?.value;
 
+  console.log("HEADERS:", request.headers.get("x-refresh-token"));
   console.log("ALL COOKIES:", request.cookies.getAll());
 
   console.log("Path:", pathname);
