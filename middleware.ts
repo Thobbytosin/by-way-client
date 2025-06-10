@@ -4,6 +4,10 @@ const protectedPaths = ["/profile", "/course-class", "/admin"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const access_token = request.cookies.get("access_Token")?.value;
+
+  console.log("Path:", pathname);
+  console.log("Token exists:", Boolean(access_token));
 
   // run check only on the selected routes
   const isProtected = protectedPaths.some((route) =>

@@ -9,26 +9,26 @@ import Image from "next/image";
 import { styles } from "@/styles/style";
 import { useSelector } from "react-redux";
 import avatar from "@/public/assets/avatar.png";
-import { useRouter } from "next/navigation";
 import SmartLink from "./SmartLink";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
+import { RootState } from "@/redux/store";
 
 type Props = {
   activeItem?: number | null;
 };
 
 const Header: FC<Props> = ({ activeItem }) => {
-  const router = useRouter();
-
+  const { navigate } = useRouteLoader();
   const [openSidebar, setOpenSidebar] = useState(false);
   const [active, setActive] = useState(false);
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
     if (searchTerm === "") {
       return;
     } else {
-      router.push(`/courses?search=${searchTerm}`);
+      navigate(`/courses?search=${searchTerm}`);
     }
   };
 
