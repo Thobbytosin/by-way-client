@@ -17,8 +17,6 @@ export function middleware(request: NextRequest) {
   //   get access token
   const access_token = request.cookies.get("access_token")?.value;
 
-  console.log("ACCESS TOKEN:", access_token);
-
   if (!access_token) {
     // redirect to home page if there is no token
     const homeUrl = new URL("/", request.url);

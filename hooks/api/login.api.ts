@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/auth/authSlice";
+import { ApiError, ApiResponse } from "@/types/api.types";
 
 interface LoginRequest {
   email: string;
@@ -12,12 +12,11 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
-  success: boolean;
-  message: string;
-  data: {
-    user: any;
-    expiresAt: number;
-  };
+  user: any;
+  expiresAt: number;
+  accessToken: string;
+  refreshToken: string;
+  loggedInToken: string;
 }
 
 export function useLoginMutation() {
@@ -25,7 +24,7 @@ export function useLoginMutation() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  return useMutation<LoginResponse, AxiosError, LoginRequest>({
+  return useMutation<ApiResponse<LoginResponse>, ApiError, LoginRequest>({
     mutationFn: async (credentials: LoginRequest) => {
       const res = await axios.post("/api/auth/login", credentials, {
         withCredentials: true, // Important for sending cookies
@@ -37,11 +36,11 @@ export function useLoginMutation() {
       if (!response.success) return;
 
       toast.success(response.message);
-      dispatch(setUser(response.data.user));
+      dispatch(setUser(response.data?.user));
 
       localStorage.setItem(
         "access_token_expiry",
-        JSON.stringify(response.data.expiresAt)
+        JSON.stringify(response.data?.expiresAt)
       );
 
       queryClient.invalidateQueries({ queryKey: ["user"] });

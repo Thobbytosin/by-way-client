@@ -1,19 +1,30 @@
 import { SERVER_URI } from "@/config/api";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const isProduction = process.env.NODE_ENV === "production";
   const ACCESS_TOKEN_EXPIRY = Number(process.env.ACCESS_TOKEN_EXPIRY);
   const LOGGEDIN_TOKEN_EXPIRY = Number(process.env.LOGGEDIN_TOKEN_EXPIRY);
   const REFRESH_TOKEN_EXPIRY = Number(process.env.REFRESH_TOKEN_EXPIRY);
 
-  const body = await req.json();
+  const cookieStore = cookies();
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  const backendRes = await fetch(`${SERVER_URI}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    credentials: "include", // Include backend cookies if needed
+  if (!refreshToken) {
+    return NextResponse.json(
+      { message: "No refresh token found" },
+      { status: 401 }
+    );
+  }
+
+  const backendRes = await fetch(`${SERVER_URI}/refresh-tokens`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `refresh_token=${refreshToken}`,
+    },
+    credentials: "include",
   });
 
   const data = await backendRes.json();
@@ -24,8 +35,8 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json(data);
 
-  if (data.data.accessToken) {
-    res.cookies.set("access_token", data.data.accessToken, {
+  if (data?.accessToken) {
+    res.cookies.set("access_token", data.accessToken, {
       httpOnly: isProduction,
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
@@ -34,8 +45,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  if (data.data.refreshToken) {
-    res.cookies.set("refresh_token", data.data.refreshToken, {
+  if (data?.refreshToken) {
+    res.cookies.set("refresh_token", data.refreshToken, {
       httpOnly: isProduction,
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
@@ -44,8 +55,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  if (data.data.loggedInToken) {
-    res.cookies.set("_can_logged_in", data.data.loggedInToken, {
+  if (data?.loggedInToken) {
+    res.cookies.set("_can_logged_in", data.loggedInToken, {
       httpOnly: false, // This one is readable by client
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
