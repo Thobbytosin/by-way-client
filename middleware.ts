@@ -4,6 +4,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const access_Token = request.cookies.get("access_Token")?.value;
 
+  console.log("ALL COOKIES:", request.cookies.getAll());
+
   console.log("Path:", pathname);
   console.log("Token exists:", Boolean(access_Token));
 

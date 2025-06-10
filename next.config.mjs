@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // experimental: {
-  //   // appDir: true, // Enable the App Router
-
-  // },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination:
+          "https://e-learning-server-wzjv.onrender.com/api/v1/:path*",
+      },
+    ];
+  },
   images: {
     remotePatterns: [{ hostname: "res.cloudinary.com" }],
   },
