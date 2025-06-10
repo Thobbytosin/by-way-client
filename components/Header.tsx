@@ -153,9 +153,7 @@ const Header: FC<Props> = ({ activeItem }) => {
 
           {/* sign in/up & theme toggler  show only laptop*/}
           <div className=" hidden md:flex items-center ">
-            {!isAuthLoaded ? (
-              <InLineLoader />
-            ) : user ? (
+            {user ? (
               <SmartLink
                 href={`/profile/${user?.name
                   ?.toLowerCase()
