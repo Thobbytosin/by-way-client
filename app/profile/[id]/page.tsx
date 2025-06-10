@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
-  const token = cookies().get("access_Token")?.value;
+  const token = cookies().get("access_token")?.value;
   console.log("TOKEN:", token);
 
   if (!token) {
