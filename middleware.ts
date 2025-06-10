@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const access_Token = request.cookies.get("access_Token")?.value;
+  const access_Token = request.cookies.get("_can_logged_t")?.value;
 
   console.log("ALL COOKIES:", request.cookies.getAll());
 
