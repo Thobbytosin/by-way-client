@@ -1,15 +1,23 @@
 import { useAuthMutations } from "@/hooks/api/auth.api";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
+import axios from "axios";
 import { signOut } from "next-auth/react";
 import React, { FC } from "react";
+import toast from "react-hot-toast";
 
 type Props = {};
 
 const Logout: FC<Props> = () => {
   const { logoutUser } = useAuthMutations();
+  const { navigate } = useRouteLoader();
 
   const handleLogout = async () => {
     try {
-      logoutUser(null);
+      await axios.post("/api/auth/logout");
+      toast.success("Logged out");
+      localStorage.removeItem("access_token_expiry");
+      navigate("/");
+
       await signOut(); // signout from google too
     } catch (error) {}
   };

@@ -24,3 +24,13 @@ export interface AuthState {
   user: TUser | null;
   isAuthLoaded: boolean;
 }
+
+export interface UserCoursesSummary {
+  id: string;
+  thumbnail: { id: string; url: string } | string;
+  name: string;
+  purchase: number;
+  ratings: number;
+  progress: [{ videoId: string; viewed: boolean; _id: string }];
+  reviewed: boolean;
+}

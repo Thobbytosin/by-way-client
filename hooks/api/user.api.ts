@@ -4,6 +4,7 @@ import {
   DELETEUSERBYID,
   GETADMIN,
   GETALLUSERSADMIN,
+  GETUSERCOURSESSUMMARY,
   GETUSERSLIST,
   UPDATEAVATAR,
   UPDATEUSERINFO,
@@ -11,13 +12,13 @@ import {
   UPDATEUSERROLE,
   UPDATEVIEWEDLESSON,
 } from "@/config/user.endpoints";
-import { TUser, UserDetail } from "@/types/user.types";
+import { TUser, UserCoursesSummary, UserDetail } from "@/types/user.types";
 import { useMutateData } from "./useApi";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useUserQueries = (options: {
-  type: "user-lists" | "admin" | "all-users";
+  type: "user-lists" | "admin" | "all-users" | "user-courses-summary";
 }) => {
   const { isLoading, isOnline } = useServerStatus();
 
@@ -56,6 +57,17 @@ export const useUserQueries = (options: {
     enabled: commonEnabled && options.type === "all-users",
   });
 
+  //  user courses summary
+  const {
+    data: userCoursesSummaryResponse,
+    error: userCoursesSummaryError,
+    loading: userCoursesSummaryLoading,
+  } = useQueryWrapper<UserCoursesSummary[]>({
+    endpoint: GETUSERCOURSESSUMMARY,
+    queryKey: ["user-courses-summary"],
+    enabled: commonEnabled && options.type === "user-courses-summary",
+  });
+
   return {
     usersDomainData: {
       ...(options.type === "user-lists" && {
@@ -76,6 +88,13 @@ export const useUserQueries = (options: {
         allUsers: allUsersResponse?.data,
         allUsersLoading,
         allUsersError,
+      }),
+    },
+    userCoursesSummaryDomainData: {
+      ...(options.type === "user-courses-summary" && {
+        userCoursesSummary: userCoursesSummaryResponse?.data,
+        userCoursesSummaryLoading,
+        userCoursesSummaryError,
       }),
     },
   };

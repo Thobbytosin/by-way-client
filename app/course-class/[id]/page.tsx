@@ -74,8 +74,6 @@ const Page = ({ params }: any) => {
       });
 
       setGroupedSections(groupedSections);
-
-      console.log("GROUPED SECTIONS:", groupedSections);
     }
   }, [courseData]);
 

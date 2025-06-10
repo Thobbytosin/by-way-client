@@ -18,6 +18,7 @@ export const API_USER_PATHS = {
   GETALLUSERSADMIN: "/get-all-users",
   UPDATEUSERROLE: "/update-user-role",
   DELETEUSERBYID: "/delete-user",
+  GETUSERCOURSESSUMMARY: "/get-user-courses-summary",
 };
 
 export const API_COURSES_PATHS = {
