@@ -59,7 +59,7 @@ export const useAuthMutations = () => {
   >({
     method: "POST",
     mutationKey: ["loginUser"],
-    url: "/api/auth/login", // next js api
+    url: LOGIN,
     skipAuthRefresh: true,
     onSuccess: (response) => {
       if (!response.success) return;
