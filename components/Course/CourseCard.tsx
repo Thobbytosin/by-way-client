@@ -36,9 +36,17 @@ const CourseCard: FC<Props> = ({ course, i }) => {
     >
       {/* thumbnail */}
       <div className=" w-full h-[150px] overflow-clip rounded-lg">
-        {course?.thumbnail?.url ? (
+        {typeof course?.thumbnail === "object" ? (
           <Image
             src={course?.thumbnail?.url}
+            alt="thumbnail"
+            width={200}
+            height={200}
+            className=" w-full h-full object-cover"
+          />
+        ) : typeof course?.thumbnail === "string" ? (
+          <Image
+            src={course?.thumbnail}
             alt="thumbnail"
             width={200}
             height={200}

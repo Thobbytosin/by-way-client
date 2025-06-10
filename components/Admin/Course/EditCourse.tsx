@@ -186,10 +186,6 @@ const EditCourse: FC<Props> = ({ id }) => {
     setForm(formData);
   };
 
-  // for (const [key, value] of form?.entries() || []) {
-  //   console.log(key, value);
-  // }
-
   // handle update course
   const handleCourseEdit = () => {
     if (form) {
