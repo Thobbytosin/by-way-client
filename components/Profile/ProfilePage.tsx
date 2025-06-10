@@ -10,7 +10,7 @@ import Loader from "@/components/Loader/Loader";
 import { RootState } from "@/redux/store";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
 import ServerErrorUI from "@/components/Home/ServerErrorUI";
-import { useRouter } from "next/navigation";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {};
 
@@ -20,31 +20,19 @@ const ProfilePage = (props: Props) => {
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
+  const { navigate } = useRouteLoader();
 
   useEffect(() => {
     setIsMounted(true); // Set to true once the component is mounted
   }, []);
 
-  //   const router = useRouter();
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [user]);
 
-  //   const cookies = document?.cookie;
-  //   const token = cookies
-  //     .split("; ")
-  //     .find((row) => row.startsWith("access_Token="));
-  //   console.log("COOKIES:", cookies);
-
-  //   useEffect(() => {
-  //     const cookies = document?.cookie;
-  //     const token = cookies
-  //       .split("; ")
-  //       .find((row) => row.startsWith("access_Token="));
-
-  //     if (!token) {
-  //       router.push("/");
-  //     }
-  //   }, []);
-
-  if (!isMounted) {
+  if (!isMounted || !user) {
     return <Loader key={"loading"} />;
   }
 

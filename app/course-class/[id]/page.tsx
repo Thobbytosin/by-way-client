@@ -18,6 +18,7 @@ import { CourseData } from "@/types/course.types";
 import CourseClassContent from "@/components/Course/Class/CourseClassContent";
 import CourseClassContentList from "@/components/Course/Class/CourseClassContentList";
 import { LessonStatus } from "@/types/user.types";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 export type SectionGroup = {
   sectionTitle: string;
@@ -25,7 +26,7 @@ export type SectionGroup = {
 };
 
 const Page = ({ params }: any) => {
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   const id = params.id;
   const { courseContentDomain } = useCourseQueries({
     courseId: id,
@@ -45,12 +46,13 @@ const Page = ({ params }: any) => {
   const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      navigate("/");
+    }
 
     const hasUserPurchaseCourse = user?.courses.find((c) => c.courseId === id);
     if (!hasUserPurchaseCourse) {
-      toast.error("You have not purchased this course");
-      router.push("/");
+      navigate("/");
     }
   }, [user, id]);
 
