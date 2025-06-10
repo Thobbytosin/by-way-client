@@ -22,15 +22,12 @@ import { TUser } from "@/types/user.types";
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isOnline, isLoading } = useServerStatus();
-  const isUserSignedIn =
-    typeof document !== "undefined" &&
-    document.cookie.includes("_can_logged_t");
 
   const { data, error, loading, isSuccess } = useQueryWrapper<TUser>({
     endpoint: FETCHUSER,
     queryKey: ["user"],
     requiresAuth: true,
-    enabled: !isLoading && isOnline && isUserSignedIn,
+    enabled: !isLoading && isOnline,
   });
 
   useEffect(() => {

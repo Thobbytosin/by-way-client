@@ -8,12 +8,10 @@ export const useServerStatus = (options?: { checkInterval?: number }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout>();
-  const isMounted = typeof document !== "undefined";
   const wasOfflineRef = useRef(false);
   const consecutiveChecksRef = useRef(0);
 
   const checkStatus = async () => {
-    if (!isMounted) return;
     setIsLoading(true);
     setError(null);
 

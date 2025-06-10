@@ -12,6 +12,7 @@ import avatar from "@/public/assets/avatar.png";
 import SmartLink from "./SmartLink";
 import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 import { RootState } from "@/redux/store";
+import InLineLoader from "./Loader/InlineLoader";
 
 type Props = {
   activeItem?: number | null;
@@ -21,7 +22,7 @@ const Header: FC<Props> = ({ activeItem }) => {
   const { navigate } = useRouteLoader();
   const [openSidebar, setOpenSidebar] = useState(false);
   const [active, setActive] = useState(false);
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthLoaded } = useSelector((state: RootState) => state.auth);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
@@ -152,34 +153,34 @@ const Header: FC<Props> = ({ activeItem }) => {
 
           {/* sign in/up & theme toggler  show only laptop*/}
           <div className=" hidden md:flex items-center ">
-            {user ? (
+            {!isAuthLoaded ? (
+              <InLineLoader />
+            ) : user ? (
               <SmartLink
                 href={`/profile/${user?.name
                   ?.toLowerCase()
                   .replace(/\s+/g, "-")}`}
               >
-                <div className="h-[30px] w-[32px] rounded-full border-2 border-primary mr-6   flex justify-center items-center overflow-hidden">
+                <div className="h-[30px] w-[32px] rounded-full border-2 border-primary mr-6 flex justify-center items-center overflow-hidden">
                   <Image
-                    src={user?.avatar ? user.avatar?.url : avatar}
+                    src={user?.avatar ? user.avatar.url : avatar}
                     alt="avatar"
                     width={30}
                     height={30}
-                    className=" w-full h-full"
+                    className="w-full h-full"
                   />
                 </div>
               </SmartLink>
             ) : (
-              <div className=" flex gap-2 mr-4">
-                <SmartLink href="/login" className=" w-full h-full">
-                  <button
-                    className={`rounded-sm text-white text-xs w-20 py-2   bg-primary hover:text-primary hover:bg-transparent hover:border hover:border-primary transition duration-300`}
-                  >
+              <div className="flex gap-2 mr-4">
+                <SmartLink href="/login" className="w-full h-full">
+                  <button className="rounded-sm text-white text-xs w-20 py-2 bg-primary hover:text-primary hover:bg-transparent hover:border hover:border-primary transition duration-300">
                     Login
                   </button>
                 </SmartLink>
 
-                <SmartLink href="/register" className=" w-full h-full">
-                  <button className=" rounded-sm   text-white dark:text-slate-700 bg-slate-700 dark:bg-white text-xs w-20 py-2 hover:bg-opacity-80 transition duration-300 ">
+                <SmartLink href="/register" className="w-full h-full">
+                  <button className="rounded-sm text-white dark:text-slate-700 bg-slate-700 dark:bg-white text-xs w-20 py-2 hover:bg-opacity-80 transition duration-300">
                     Sign up
                   </button>
                 </SmartLink>

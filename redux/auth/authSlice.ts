@@ -6,6 +6,7 @@ type CompleteAuthState = AuthState & { _persist: PersistedState };
 
 const initialState: CompleteAuthState = {
   user: null,
+  isAuthLoaded: false,
   _persist: undefined,
 };
 
@@ -15,6 +16,7 @@ const authSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
+      state.isAuthLoaded = true;
     },
   },
 });

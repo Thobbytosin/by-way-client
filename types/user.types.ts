@@ -22,4 +22,5 @@ export type TUser = {
 
 export interface AuthState {
   user: TUser | null;
+  isAuthLoaded: boolean;
 }
