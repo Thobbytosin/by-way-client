@@ -38,13 +38,13 @@ axiosInstance.interceptors.request.use(async (config) => {
   // refresh only if route needs tokens and tokens is expiring soon
   if (!customConfig.skipAuthRefresh && isAccessTokenExpiringSoon()) {
     try {
-      // console.log(
-      //   "THE ACCESS TOKEN IS EXPIRING SOON SO I AM CALLING THE REFRESH TOKEN"
-      // );
+      console.log(
+        "THE ACCESS TOKEN IS EXPIRING SOON SO I AM CALLING THE REFRESH TOKEN"
+      );
 
-      await axios.get("/api/auth/refresh-token", {
-        withCredentials: true,
-      });
+      await axiosInstance.get("/refresh-tokens", {
+        skipAuthRefresh: true,
+      } as CustomAxiosRequestConfig);
 
       // set new expiry
       localStorage.setItem(
@@ -81,13 +81,20 @@ axiosInstance.interceptors.response.use(
       if (!originalRequest._retry) {
         originalRequest._retry = true; // to avoid infinte loops
         try {
-          // console.log(
-          //   "ORIGINAL REQUEST FAILED SO I AM REFRSHING THE TOKEN AND RECALLING THE FAILED REQUEST AGAIN"
-          // );
+          console.log(
+            "ORIGINAL REQUEST FAILED SO I AM REFRSHING THE TOKEN AND RECALLING THE FAILED REQUEST AGAIN"
+          );
 
-          await axios.get("/api/auth/refresh-token", {
-            withCredentials: true,
-          });
+          await axiosInstance.get("/refresh-tokens", {
+            skipAuthRefresh: true,
+          } as CustomAxiosRequestConfig); // refresh
+
+          // await axios.get("/api/auth/refresh-token", {
+          //   withCredentials: true,
+          // });
+
+          // // Retry original request
+          // return axiosInstance(originalRequest);
 
           // set new expiry
           localStorage.setItem(
