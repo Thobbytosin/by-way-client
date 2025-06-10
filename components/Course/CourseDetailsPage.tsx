@@ -6,7 +6,6 @@ import Loader from "../Loader/Loader";
 import { useCourseQueries } from "@/hooks/api/course.api";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
 import ServerErrorUI from "../Home/ServerErrorUI";
-import { useRouter } from "next/navigation";
 
 type Props = {
   id: string;

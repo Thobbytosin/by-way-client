@@ -1,7 +1,14 @@
-import { GETLAYOUTTYPE } from "@/config/layout.endpoints";
+import { EDITLAYOUT, GETLAYOUTTYPE } from "@/config/layout.endpoints";
 import { useQueryWrapper } from "./useQueryWrapper";
-import { BannerContent, CategoriesContent, FAQsContent } from "@/types/content";
+import {
+  BannerContent,
+  CategoriesContent,
+  FAQsContent,
+} from "@/types/content.types";
 import { useServerStatus } from "./useServerStatus";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMutateData } from "./useApi";
+import toast from "react-hot-toast";
 
 export const useContentQueries = (options: {
   hero?: boolean;
@@ -59,6 +66,95 @@ export const useContentQueries = (options: {
         categoriesError: categoriesQuery.error,
       }),
       ...(options.faq && { faqsError: faqsQuery.error }),
+    },
+  };
+};
+
+export const useContentMutations = () => {
+  const queryClient = useQueryClient();
+
+  // edit categories
+  const { mutate: updateCategories, isPending: updateCategoriesPending } =
+    useMutateData<
+      null,
+      { type: "Categories"; categories: { title: string }[] }
+    >({
+      method: "PUT",
+      mutationKey: [`update-categories-content`],
+      url: EDITLAYOUT,
+      skipAuthRefresh: false,
+      onSuccess: (response) => {
+        if (!response.success) return;
+
+        toast.success(response.message);
+
+        queryClient.invalidateQueries({
+          queryKey: ["layout", "categories"],
+        });
+      },
+      onError: (error) => {
+        toast.error(`${error.message}`);
+      },
+    });
+
+  // edit faqs
+  const { mutate: updateFaqs, isPending: updateFaqsPending } = useMutateData<
+    null,
+    { type: "FAQ"; faqs: { question: string; answer: string }[] }
+  >({
+    method: "PUT",
+    mutationKey: [`update-faqs-content`],
+    url: EDITLAYOUT,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({
+        queryKey: ["layout", "faq"],
+      });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // edit hero
+  const { mutate: updateHero, isPending: updateHeroPending } = useMutateData<
+    null,
+    { type: "Banner"; image: string; title: string; subTitle: string }
+  >({
+    method: "PUT",
+    mutationKey: [`update-hero-content`],
+    url: EDITLAYOUT,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({
+        queryKey: ["layout", "hero"],
+      });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  return {
+    updateCategoriesDomain: {
+      updateCategories,
+      updateCategoriesPending,
+    },
+    updateFaqsDomain: {
+      updateFaqs,
+      updateFaqsPending,
+    },
+    updateHeroDomain: {
+      updateHero,
+      updateHeroPending,
     },
   };
 };

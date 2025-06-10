@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
-import { styles } from "../../../styles/style";
-import { useGetHeroDataQuery } from "../../../redux/layout/layoutApi";
+import { styles } from "@/styles/style";
 import Image from "next/image";
+import { useContentQueries } from "@/hooks/api/content.api";
 
 type Props = {
   courseInfo: any;
@@ -24,11 +24,15 @@ const CourseInformation: FC<Props> = ({
   setActive,
   isEdit,
 }) => {
-  const [categories, setCategories] = useState([]);
-  const { data } = useGetHeroDataQuery("Categories", {});
+  const { contentDomainData } = useContentQueries({
+    categories: true,
+  });
+  const { categories: categoriesData } = contentDomainData;
+
+  const [categories, setCategories] = useState<
+    { title: string; _id?: string }[]
+  >([]);
   const [dragging, setDragging] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [videoPreview, setVide0Preview] = useState<string>("");
 
   // for image
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,9 +42,15 @@ const CourseInformation: FC<Props> = ({
     if (file) {
       const preview = URL.createObjectURL(file);
       setCourseInfo({ ...courseInfo, thumbnail: file, imagePreview: preview });
-      setImagePreview(URL.createObjectURL(file));
     }
   };
+
+  // console.log("IMAGE PREVIEW", courseInfo?.imagePreview);
+  // console.log("THUMBNAIL", courseInfo.thumbnail);
+  // console.log("DEMO VIDEO", courseInfo.demoVideo);
+  // console.log("image preview", imagePreview.trim() === "");
+  // console.log("video preview", videoPreview);
+  // console.log(isEdit && !courseInfo?.imagePreview);
 
   // for video upload
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +65,6 @@ const CourseInformation: FC<Props> = ({
 
     // 2. Create blob URL for instant preview
     const videoUrl = URL.createObjectURL(file);
-    setVide0Preview(videoUrl);
 
     // 3. Update state with both file object and preview URL
     setCourseInfo({
@@ -71,10 +80,10 @@ const CourseInformation: FC<Props> = ({
   // console.log(courseInfo);
 
   useEffect(() => {
-    if (data) {
-      setCategories(data.layout.categories);
+    if (categoriesData) {
+      setCategories(categoriesData);
     }
-  }, [data]);
+  }, [categoriesData]);
 
   const handleDragOver = (e: any) => {
     e.preventDefault();
@@ -115,6 +124,8 @@ const CourseInformation: FC<Props> = ({
     e.preventDefault();
     setActive(active + 1);
   };
+
+  // console.log(courseInfo);
 
   return (
     <div className=" mt-[6rem] w-[80%] ">
@@ -233,11 +244,15 @@ const CourseInformation: FC<Props> = ({
               }
               className={`${styles.inputStyle} text-black dark:text-white mt-4`}
             >
-              <option value="" className=" text-black">
+              <option value="" className=" text-black dark:text-white">
                 Select Category
               </option>
               {categories?.map((category: any, i) => (
-                <option key={i} value={category.title} className=" text-black">
+                <option
+                  key={i}
+                  value={category.title}
+                  className=" text-black dark:text-white"
+                >
                   {category.title}
                 </option>
               ))}
@@ -265,31 +280,16 @@ const CourseInformation: FC<Props> = ({
                 Select Category
               </option>
               {levels?.map((category: any, i) => (
-                <option key={i} value={category.title} className=" text-black">
+                <option
+                  key={i}
+                  value={category.title}
+                  className=" text-black dark:text-white"
+                >
                   {category.title}
                 </option>
               ))}
             </select>
           </div>
-
-          {/* demo url */}
-          {/* <div className=" w-[50%]">
-            <label htmlFor="demoUrl" className="text-sm font-medium">
-              Demo URL
-            </label>
-            <input
-              type="text"
-              name="demoUrl"
-              id="demoUrl"
-              value={courseInfo.demoUrl}
-              placeholder="sg5dhjs32"
-              required
-              onChange={(e: any) =>
-                setCourseInfo({ ...courseInfo, demoUrl: e.target.value })
-              }
-              className={styles.inputStyle}
-            />
-          </div> */}
         </div>
 
         {/* course thumbnail */}
@@ -314,9 +314,9 @@ const CourseInformation: FC<Props> = ({
               <div className="relative w-full">
                 <Image
                   src={
-                    isEdit && courseInfo.thumbnail.url
-                      ? courseInfo.thumbnail.url
-                      : imagePreview
+                    isEdit && !courseInfo.imagePreview
+                      ? courseInfo.thumbnail
+                      : courseInfo.imagePreview
                   }
                   alt="course_image"
                   width={200}
@@ -351,16 +351,18 @@ const CourseInformation: FC<Props> = ({
           <label
             htmlFor="video"
             className={`${
-              dragging ? "bg-primary text-white" : "bg-gray-300"
+              dragging
+                ? "bg-primary text-white"
+                : "bg-gray-300 dark:bg-gray-800"
             } min-h-[20vh] w-full flex justify-center items-center  text-center p-3`}
           >
             {courseInfo.demoVideo ? (
-              <div className="relative w-full">
+              <div className="relative w-full flex justify-center items-center">
                 <video
                   src={
-                    isEdit && courseInfo.demoVideo.url
-                      ? courseInfo.demoVideo.url
-                      : videoPreview
+                    isEdit && !courseInfo.videoPreview
+                      ? courseInfo.demoVideo
+                      : courseInfo.videoPreview
                   }
                   controls
                   // width="400"

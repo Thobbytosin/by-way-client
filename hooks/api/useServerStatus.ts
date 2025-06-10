@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { isServerOnline } from "@/utils/isServerOnline";
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 

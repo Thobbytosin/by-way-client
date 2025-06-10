@@ -1,19 +1,24 @@
 import { useQueryWrapper } from "./useQueryWrapper";
 import { useServerStatus } from "./useServerStatus";
 import {
+  DELETEUSERBYID,
   GETADMIN,
+  GETALLUSERSADMIN,
   GETUSERSLIST,
   UPDATEAVATAR,
   UPDATEUSERINFO,
   UPDATEUSERPASSWORD,
+  UPDATEUSERROLE,
   UPDATEVIEWEDLESSON,
 } from "@/config/user.endpoints";
-import { TUser, UserDetail } from "@/types/user";
+import { TUser, UserDetail } from "@/types/user.types";
 import { useMutateData } from "./useApi";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const useUserQueries = (options: { type: "user-lists" | "admin" }) => {
+export const useUserQueries = (options: {
+  type: "user-lists" | "admin" | "all-users";
+}) => {
   const { isLoading, isOnline } = useServerStatus();
 
   const commonEnabled = !isLoading && isOnline;
@@ -40,6 +45,17 @@ export const useUserQueries = (options: { type: "user-lists" | "admin" }) => {
     enabled: commonEnabled && options.type === "admin",
   });
 
+  // all users
+  const {
+    data: allUsersResponse,
+    error: allUsersError,
+    loading: allUsersLoading,
+  } = useQueryWrapper<TUser[]>({
+    endpoint: GETALLUSERSADMIN,
+    queryKey: ["all-users-admin"],
+    enabled: commonEnabled && options.type === "all-users",
+  });
+
   return {
     usersDomainData: {
       ...(options.type === "user-lists" && {
@@ -55,8 +71,19 @@ export const useUserQueries = (options: { type: "user-lists" | "admin" }) => {
         adminError,
       }),
     },
+    allUsersDomainData: {
+      ...(options.type === "all-users" && {
+        allUsers: allUsersResponse?.data,
+        allUsersLoading,
+        allUsersError,
+      }),
+    },
   };
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const useUserMutations = () => {
   const queryClient = useQueryClient();
@@ -139,14 +166,71 @@ export const useUserMutations = () => {
       },
     });
 
+  // update User role
+  const {
+    mutate: updateRole,
+    isSuccess: updateRoleSuccess,
+    isPending: updateRolePending,
+  } = useMutateData<null, { email: string; role: string }>({
+    method: "PUT",
+    mutationKey: ["update-role"],
+    url: UPDATEUSERROLE,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["all-users-admin"] });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // delete user
+  const {
+    mutate: deleteUser,
+    isSuccess: deleteUserSuccess,
+    isPending: deleteUserPending,
+  } = useMutateData<null, { userId: string }>({
+    method: "DELETE",
+    mutationKey: ["delete-user"],
+    url: DELETEUSERBYID,
+    paramKey: "userId",
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({ queryKey: ["all-users-admin"] });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
   return {
-    infoLoading: { updateAvatarPending, updatePasswordPending },
+    infoLoading: {
+      updateAvatarPending,
+      updatePasswordPending,
+      updateRolePending,
+      deleteUserPending,
+    },
     userInfo: {
       updateUser,
       updatePassword,
       updateProfilePicture,
       updateViewedLesson,
+      updateRole,
+      deleteUser,
     },
-    userInfoSuccess: { updateViewedLessonSuccess },
+    userInfoSuccess: {
+      updateViewedLessonSuccess,
+      updateRoleSuccess,
+      deleteUserSuccess,
+    },
   };
 };

@@ -6,15 +6,11 @@ import {
   LockIcon,
   OndemandVideoIcon,
 } from "@/icons/icons";
-import Image from "next/image";
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
-import successGif from "@/public/assets/completed.gif";
-import { CourseData } from "@/types/course";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { CourseData } from "@/types/course.types";
 import { SectionGroup } from "@/app/course-class/[id]/page";
-import { LessonStatus } from "@/types/user";
+import { LessonStatus } from "@/types/user.types";
 import { contentTotalDuration } from "@/utils/helpers";
 
 type Props = {
@@ -84,20 +80,16 @@ const CourseClassContentList: FC<Props> = ({
         <div
           className={`${
             hideForLargeTrue ? "hidden lg:block mt-[8.5rem]" : "mt-0"
-          } w-full h-fit bg-[#E2E8F0] dark:bg-[#0B1739] rounded-lg sm:rounded-xl lg:col-span-3 col-span-10 mx-auto sm:pt-3 pt-1`}
+          } w-full h-fit bg-[#E2E8F0] dark:bg-[#0B1739] rounded-lg sm:rounded-xl lg:col-span-3 col-span-10 mx-auto py-6`}
         >
-          <div className="mb-4 pt-6 px-6 flex items-center w-full justify-between">
-            {/* <h2 className=" text-[0.88rem] sm:text-[1rem] font-semibold">
-              Course Progress
-            </h2> */}
-
-            <div className=" basis-1/2 bg-gray-500 dark:bg-black rounded-full h-2">
+          <div className="mb-4  px-6 flex items-center w-full justify-between gap-10">
+            <div className="w-full bg-gray-400 dark:bg-black rounded-full h-2">
               <div
                 className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
-            <p className="text-xs text-gray-700 dark:text-white font-semibold">
+            <p className="min-w-fit text-xs text-gray-700 dark:text-white font-semibold">
               {completionPercentage}% completed
             </p>
           </div>
@@ -109,7 +101,7 @@ const CourseClassContentList: FC<Props> = ({
             const locked = isSectionLocked(section.sectionTitle);
 
             return (
-              <div key={index} className=" px-3 my-6 ">
+              <div key={index} className=" px-3">
                 <div
                   onClick={() => toggleSection(section.sectionTitle)}
                   className=" bg-white dark:bg-black flex justify-between items-center mb-4 p-2 cursor-pointer"
@@ -130,7 +122,7 @@ const CourseClassContentList: FC<Props> = ({
 
                 {/* videos in a section */}
                 {expanded && (
-                  <div className=" space-y-2">
+                  <div className="space-y-2">
                     {section.videos.map((video, i) => {
                       // find current lesson index from the course data
                       const lessonIndex = courseData?.findIndex(

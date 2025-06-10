@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQueryWrapper } from "./useQueryWrapper";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
@@ -9,12 +9,16 @@ import {
   ADDREPLTYTOCOURSEREVIEWBYID,
   ADDREPLYTOQUESTION,
   ALLCOURSESFREE,
+  CREATECOURSE,
+  DELETECOURSEBYID,
+  EDITCOURSEBYID,
+  GETALLCOURSESADMIN,
   GETCOURSEBYID,
   GETCOURSEBYIDFREE,
   GETCOURSECONTENTBYID,
 } from "@/config/course.endpoints";
 import { setCoursesFree } from "@/redux/course/course.slice";
-import { Course, CourseData, CourseQueryOptions } from "@/types/course";
+import { Course, CourseData, CourseQueryOptions } from "@/types/course.types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutateData } from "./useApi";
 import toast from "react-hot-toast";
@@ -81,6 +85,17 @@ export const useCourseQueries = (options: CourseQueryOptions) => {
     enabled: commonEnabled && options.type === "course-content",
   });
 
+  // get all courses - admin
+  const {
+    data: allCoursesResponse,
+    error: allCoursesError,
+    loading: allCoursesLoading,
+  } = useQueryWrapper<Course[]>({
+    endpoint: GETALLCOURSESADMIN,
+    queryKey: ["all-courses-admin"],
+    enabled: commonEnabled && options.type === "all-courses",
+  });
+
   return {
     coursesFreeDomain: {
       ...(options.type === "free-list" && {
@@ -111,10 +126,17 @@ export const useCourseQueries = (options: CourseQueryOptions) => {
         courseDataError: courseContentError,
       }),
     },
+    allCoursesDomain: {
+      ...(options.type === "all-courses" && {
+        allCourses: allCoursesResponse?.data,
+        allCoursesLoading: allCoursesLoading,
+        allCoursesError: allCoursesError,
+      }),
+    },
   };
 };
 
-export const useCourseMutations = (courseId: string) => {
+export const useCourseMutations = (courseId?: string) => {
   const queryClient = useQueryClient();
 
   // add question
@@ -225,24 +247,107 @@ export const useCourseMutations = (courseId: string) => {
     },
   });
 
+  // delete course
+  const {
+    mutate: deleteCourse,
+    isSuccess: deleteCourseSuccess,
+    isPending: deleteCoursePending,
+  } = useMutateData<null, { courseId: string }>({
+    method: "DELETE",
+    mutationKey: [`delete-course-${courseId}`],
+    url: DELETECOURSEBYID,
+    paramKey: "courseId",
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+      toast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: ["all-courses-admin"] });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // create course
+  const {
+    mutate: createCourse,
+    isSuccess: createCourseSuccess,
+    isPending: createCoursePending,
+  } = useMutateData<null, FormData>({
+    method: "POST",
+    mutationKey: [`create-course`],
+    url: CREATECOURSE,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({ queryKey: ["courses-free"] });
+
+      queryClient.invalidateQueries({ queryKey: ["all-courses-admin"] });
+    },
+    onError: (error) => {
+      toast.error(`${error.message}`);
+    },
+  });
+
+  // edit course
+  const {
+    mutate: updateCourse,
+    isSuccess: updateCourseSuccess,
+    isPending: updateCoursePending,
+  } = useMutateData<null, FormData>({
+    method: "PUT",
+    mutationKey: [`update-course-${courseId}`],
+    url: EDITCOURSEBYID,
+    params: `/${courseId}`,
+    skipAuthRefresh: false,
+    onSuccess: (response) => {
+      if (!response.success) return;
+
+      toast.success(response.message);
+
+      queryClient.invalidateQueries({
+        queryKey: [`course-${courseId}`],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["all-courses-admin"],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(`${error.message}`);
+    },
+  });
+
   return {
     courseInfoPending: {
       submitQuestionPending,
       submitRepyToQuestionPending,
       submitReviewPending,
       submitReviewReplyPending,
+      deleteCoursePending,
+      createCoursePending,
+      updateCoursePending,
     },
     courseInfo: {
       submitQuestion,
       submitRepyToQuestion,
       submitReview,
       submitReviewReply,
+      deleteCourse,
+      createCourse,
+      updateCourse,
     },
     courseInfoSuccess: {
       submitQuestionSuccess,
       submitRepyToQuestionSuccess,
       submitReviewSuccess,
       submitReviewReplySuccess,
+      deleteCourseSuccess,
+      createCourseSuccess,
+      updateCourseSuccess,
     },
   };
 };

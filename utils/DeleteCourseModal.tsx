@@ -4,17 +4,9 @@ type Props = {
   handleDelete: any;
   open: boolean;
   setOpen: (value: boolean) => void;
-
-  loading?: boolean;
 };
 
-const DeleteCourseModal: FC<Props> = ({
-  handleDelete,
-  open,
-  setOpen,
-
-  loading,
-}) => {
+const DeleteCourseModal: FC<Props> = ({ handleDelete, open, setOpen }) => {
   return (
     <div className=" fixed left-0 top-0 w-screen h-screen bg-black bg-opacity-80 flex justify-center items-center">
       <div

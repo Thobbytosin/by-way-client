@@ -1,8 +1,7 @@
-import React, { FC, useEffect } from "react";
-import CoursePlayer from "../../../utils/CoursePlayer";
-import Ratings from "../../../utils/Ratings";
-import { CheckIcon } from "../../../icons/icons";
-import { useRefreshTokenQuery } from "../../../redux/api/apiSlice";
+import React, { FC } from "react";
+import CoursePlayer from "@/utils/CoursePlayer";
+import Ratings from "@/utils/Ratings";
+import { CheckIcon } from "@/icons/icons";
 
 type Props = {
   active: number;
@@ -41,13 +40,6 @@ const CoursePreview: FC<Props> = ({
   handleCourseCreate,
   isEdit,
 }) => {
-  const { refetch } = useRefreshTokenQuery(undefined, { skip: false });
-
-  // refresh token when page loads
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-
   //  previous page
   const prevButton = () => {
     setActive(active - 1);
@@ -68,7 +60,11 @@ const CoursePreview: FC<Props> = ({
         <div className="w-full bg-black dark:bg-black">
           <CoursePlayer
             key={courseData?.name}
-            link={courseData?.videoPreview}
+            link={
+              courseData?.videoPreview.trim() === ""
+                ? courseData?.demoVideo
+                : courseData?.videoPreview
+            }
             isClass
           />
         </div>

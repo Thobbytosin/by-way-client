@@ -14,7 +14,6 @@ const Heading: FC<HeadProps> = ({ title, description, keywords }) => {
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="google-adsense-account" content="ca-pub-3236786508320709" />
-      {/* <link rel="icon" type="image/svg+xml" href="../../public/logo.png" /> */}
     </>
   );
 };

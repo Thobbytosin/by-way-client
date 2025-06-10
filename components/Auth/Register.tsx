@@ -8,11 +8,11 @@ import {
   AiOutlineEyeInvisible,
   AiFillGithub,
 } from "react-icons/ai";
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
-import CustomModal from "../../utils/CustomModal";
+import CustomModal from "@/utils/CustomModal";
 import Verification from "./Verification";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";

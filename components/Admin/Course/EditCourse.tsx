@@ -1,23 +1,32 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, FC } from "react";
 import CourseOptions from "./CourseOptions";
 import CourseInformation from "./CourseInformation";
 import CourseData from "./CourseData";
 import CourseContent from "./CourseContent";
 import CoursePreview from "./CoursePreview";
-import {
-  useGetAllCoursesQuery,
-  useUpdateCourseMutation,
-} from "../../../redux/course/courseApi";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Loader from "../../Loader/Loader";
+import { useCourseMutations, useCourseQueries } from "@/hooks/api/course.api";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {
   id: string;
 };
 
 const EditCourse: FC<Props> = ({ id }) => {
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
+  const { allCoursesDomain } = useCourseQueries({ type: "all-courses" });
+  const { allCourses, allCoursesLoading } = allCoursesDomain;
+
+  const {
+    courseInfo: courseInfoo,
+    courseInfoPending,
+    courseInfoSuccess,
+  } = useCourseMutations(id);
+  const { updateCourse } = courseInfoo;
+  const { updateCoursePending } = courseInfoPending;
+  const { updateCourseSuccess } = courseInfoSuccess;
+
   const [active, setActive] = useState(0);
   const [courseInfo, setCourseInfo] = useState({
     name: "",
@@ -31,9 +40,9 @@ const EditCourse: FC<Props> = ({ id }) => {
     imagePreview: "",
     videoPreview: "",
     category: "",
-    reviews: "",
+    reviews: 0,
     purchase: "",
-    ratings: "",
+    ratings: 0,
   });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisties, setPrerequisties] = useState([{ title: "" }]);
@@ -42,7 +51,7 @@ const EditCourse: FC<Props> = ({ id }) => {
       videoUrl: "",
       title: "",
       videoDescription: "",
-      videoDuration: "",
+      videoDuration: 0,
       videoSection: "Untitled Section",
       objectives: [{ title: "" }],
       links: [
@@ -55,51 +64,44 @@ const EditCourse: FC<Props> = ({ id }) => {
     },
   ]);
   const [courseData, setCourseData] = useState({});
-  const { data, refetch } = useGetAllCoursesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  const [
-    updateCourse,
-    { isLoading: uploadLoading, isSuccess: uploadSuccess, error: uploadError },
-  ] = useUpdateCourseMutation();
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<FormData>();
 
   // fetch data
   useEffect(() => {
-    if (uploadSuccess) {
-      refetch();
-      toast.success("Course updated successfully");
-      router.push("/admin/all-courses");
+    if (updateCourseSuccess) {
+      navigate("/admin/all-courses");
     }
+  }, [updateCourseSuccess]);
 
-    if (uploadError) {
-      if ("data" in uploadError) {
-        const error = uploadError as any;
-        toast.error(error.data.message);
-      }
-    }
-  }, [uploadError, uploadSuccess, refetch, router]);
+  const editCourseData = allCourses?.find((course: any) => course._id === id);
 
-  const editCourseData =
-    data && data.courses?.find((course: any) => course._id === id);
+  // console.log("COURSE DATA", editCourseData);
+  // console.log("COURSE INFO:", courseInfo);
+  // console.log("COURSE DATA:", courseData);
+
   // fetch course data
   useEffect(() => {
     if (editCourseData) {
       setCourseInfo({
         name: editCourseData.name,
         description: editCourseData.description,
-        price: editCourseData.price,
-        estimatedPrice: editCourseData.estimatedPrice,
+        price: String(editCourseData.price),
+        estimatedPrice: String(editCourseData.estimatedPrice),
         tags: editCourseData.tags,
+        imagePreview: "",
+        videoPreview: "",
         level: editCourseData.level,
         category: editCourseData.category,
-        demoVideo: editCourseData.demoVideo,
-        imagePreview: editCourseData.imagePreview,
-        videoPreview: editCourseData.videoPreview,
-        thumbnail: editCourseData.thumbnail,
-        reviews: editCourseData.reviews,
-        purchase: editCourseData.purchase,
+        demoVideo:
+          typeof editCourseData.demoVideo === "object"
+            ? editCourseData.demoVideo?.url
+            : editCourseData.demoVideo,
+        thumbnail:
+          typeof editCourseData.thumbnail === "object"
+            ? editCourseData.thumbnail.url
+            : editCourseData.thumbnail,
+        reviews: editCourseData.reviews?.length,
+        purchase: String(editCourseData.purchase),
         ratings: editCourseData.ratings,
       });
 
@@ -146,14 +148,15 @@ const EditCourse: FC<Props> = ({ id }) => {
       price: courseInfo.price,
       estimatedPrice: courseInfo.estimatedPrice,
       thumbnail: courseInfo.thumbnail,
+      demoVideo: courseInfo.demoVideo,
       tags: courseInfo.tags.trimStart().trimEnd(),
       level: courseInfo.level.trim(),
       category: courseInfo.category.trim(),
       videoPreview: courseInfo.videoPreview.trim(),
       imagePreview: courseInfo.imagePreview.trim(),
-      reviews: editCourseData.reviews,
-      purchase: editCourseData.purchase,
-      ratings: editCourseData.ratings,
+      reviews: editCourseData?.reviews,
+      purchase: editCourseData?.purchase,
+      ratings: editCourseData?.ratings,
       benefits: formatedBenefits,
       prerequisites: formatedPrerequisites,
       courseData: formatedCourseContentData,
@@ -166,6 +169,7 @@ const EditCourse: FC<Props> = ({ id }) => {
     formData.append("description", courseInfo.description.trim());
     formData.append("price", courseInfo.price);
     formData.append("estimatedPrice", courseInfo.estimatedPrice);
+    formData.append("purchase", courseInfo.purchase);
     formData.append("tags", courseInfo.tags.trim());
     formData.append("level", courseInfo.level.trim());
     formData.append("category", courseInfo.category.trim());
@@ -182,19 +186,27 @@ const EditCourse: FC<Props> = ({ id }) => {
     setForm(formData);
   };
 
+  // for (const [key, value] of form?.entries() || []) {
+  //   console.log(key, value);
+  // }
+
   // handle update course
-  const handleCourseEdit = async () => {
-    const data = { id, data: form };
-    await updateCourse(data);
+  const handleCourseEdit = () => {
+    if (form) {
+      updateCourse(form);
+    }
   };
 
   return (
     <div className=" w-full relative  p-10 min-h-full">
       {/* Course options */}
       <div className="absolute top-12 left-[2rem]">
-        <CourseOptions active={active} setActive={setActive} />
+        <CourseOptions active={active} />
       </div>
-      {!uploadLoading && (
+
+      {updateCoursePending && <Loader />}
+
+      {!updateCoursePending && (
         <>
           {active === 0 && (
             <CourseInformation
@@ -238,9 +250,6 @@ const EditCourse: FC<Props> = ({ id }) => {
           )}
         </>
       )}
-
-      {/* uploading  */}
-      {uploadLoading && <Loader />}
     </div>
   );
 };

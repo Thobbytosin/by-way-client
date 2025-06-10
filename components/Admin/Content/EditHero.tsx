@@ -1,13 +1,11 @@
-import {
-  useEditLayoutMutation,
-  useGetHeroDataQuery,
-} from "../../../redux/layout/layoutApi";
 import CameraAlt from "@mui/icons-material/CameraAlt";
 import React, { useState, FC, useEffect } from "react";
 import SimpleLoader from "../../SimpleLoader/SimpleLoader";
-import toast from "react-hot-toast";
-import Loader from "../../Loader/Loader";
 import Image from "next/image";
+import {
+  useContentMutations,
+  useContentQueries,
+} from "@/hooks/api/content.api";
 
 type Props = {};
 
@@ -16,30 +14,21 @@ const EditHero: FC<Props> = () => {
   const [image, setImage] = useState("");
   const [title, setTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
-  const { data, refetch } = useGetHeroDataQuery("Banner", {
-    refetchOnMountOrArgChange: true,
+  const { contentDomainData } = useContentQueries({
+    hero: true,
   });
-  const [editLayout, { isSuccess, isLoading, error }] = useEditLayoutMutation();
+  const { hero } = contentDomainData;
+
+  const { updateHeroDomain } = useContentMutations();
+  const { updateHero, updateHeroPending } = updateHeroDomain;
 
   useEffect(() => {
-    if (data) {
-      setTitle(data.layout?.banner?.title);
-      setSubTitle(data.layout?.banner?.subTitle);
-      setImage(data.layout?.banner?.image?.url);
+    if (hero) {
+      setTitle(hero.title);
+      setSubTitle(hero.subTitle);
+      setImage(hero.image?.url);
     }
-
-    if (isSuccess) {
-      refetch();
-      toast.success("Hero section Updated");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [data, isSuccess, error, refetch]);
+  }, [hero]);
 
   // change banner image
   const handleBannerChange = (e: any) => {
@@ -59,15 +48,17 @@ const EditHero: FC<Props> = () => {
   };
 
   // check if image is changed
-  const isBannerImageChanged = (oldImage: any, newImage: any) => {
-    // console.log(oldImage);
-    // console.log(newImage);
+  const isBannerImageChanged = (
+    oldImage: string | undefined,
+    newImage: string
+  ) => {
+    if (!oldImage) return null;
     return JSON.stringify(oldImage) === JSON.stringify(newImage);
   };
 
   // submit changes
-  const handleSubmitChanges = async () => {
-    await editLayout({ type: "Banner", image, title, subTitle });
+  const handleSubmitChanges = () => {
+    updateHero({ type: "Banner", image, title, subTitle });
   };
 
   return (
@@ -99,10 +90,10 @@ const EditHero: FC<Props> = () => {
           <label
             onMouseEnter={() => setShowHoverCamera(true)}
             onMouseLeave={() => setShowHoverCamera(false)}
-            aria-disabled={isLoading}
+            aria-disabled={updateHeroPending}
             htmlFor="banner"
             className={`${
-              isLoading ? "cursor-not-allowed" : "cursor-pointer"
+              updateHeroPending ? "cursor-not-allowed" : "cursor-pointer"
             } absolute bottom-0 right-10 bg-secondary text-white dark:bg-white dark:text-black p-4 rounded-full shadow-lg shadow-slate-500 dark:shadow-black`}
           >
             <CameraAlt color="inherit" />
@@ -110,7 +101,7 @@ const EditHero: FC<Props> = () => {
 
           {showHoverCamera && (
             <button
-              disabled={isLoading}
+              disabled={updateHeroPending}
               className=" z-[99] absolute right-20 bottom-10 dark:bg-white dark:text-secondary bg-secondary text-white p-2 rounded-md "
             >
               Change banner
@@ -122,7 +113,7 @@ const EditHero: FC<Props> = () => {
             <textarea
               className=" w-full text-3xl font-semibold outline-none bg-gray-200 dark:bg-dimDark p-4"
               placeholder="Write hero title here"
-              disabled={isLoading}
+              disabled={updateHeroPending}
               rows={6}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -131,7 +122,7 @@ const EditHero: FC<Props> = () => {
             <textarea
               className=" text-md w-full outline-none bg-gray-200 dark:bg-slate-900 mt-2 p-4"
               placeholder="Write hero subtitle here"
-              disabled={isLoading}
+              disabled={updateHeroPending}
               rows={6}
               value={subTitle}
               onChange={(e) => setSubTitle(e.target.value)}
@@ -142,24 +133,18 @@ const EditHero: FC<Props> = () => {
 
       {/* button */}
       <div className=" w-[80%] flex justify-start ml-[10rem] mt-4 mb-8">
-        {isLoading ? (
+        {updateHeroPending ? (
           <SimpleLoader isAdmin />
         ) : (
           <button
             onClick={
-              isBannerImageChanged(
-                { image: data?.layout.banner.image.url },
-                { image }
-              )
+              isBannerImageChanged(hero?.image.url, image)
                 ? () => null
                 : handleSubmitChanges
             }
-            disabled={isLoading}
+            disabled={updateHeroPending}
             className={`text-lg px-6 py-2 ${
-              isBannerImageChanged(
-                { image: data?.layout.banner.image.url },
-                { image }
-              )
+              isBannerImageChanged(hero?.image.url, image)
                 ? "bg-secondary dark:bg-white dark:text-secondary text-white opacity-70 cursor-not-allowed "
                 : "cursor-pointer bg-primary text-white"
             } rounded-md text-center`}

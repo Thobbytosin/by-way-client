@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { useRouter } from "next/navigation";
-import { DoneAllIcon } from "../../icons/icons";
-import Ratings from "../../utils/Ratings";
+import { DoneAllIcon } from "@/icons/icons";
+import Ratings from "@/utils/Ratings";
 import Loader from "../Loader/Loader";
 import Image from "next/image";
 import { useCourseQueries } from "@/hooks/api/course.api";

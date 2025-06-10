@@ -1,12 +1,9 @@
-import { styles } from "../../../styles/style";
+import { styles } from "@/styles/style";
 import React, { FC } from "react";
 import SimpleLoader from "../../SimpleLoader/SimpleLoader";
-import {
-  NotInterestedIcon,
-  ReplyIcon,
-  VerifiedIcon,
-} from "../../../icons/icons";
+import { NotInterestedIcon, ReplyIcon, VerifiedIcon } from "@/icons/icons";
 import { format } from "timeago.js";
+import Image from "next/image";
 
 type Props = {
   user: any;
@@ -53,7 +50,7 @@ const QA: FC<Props> = ({
       <div className=" w-full gap-4 flex justify-between items-start mt-8">
         {/* image */}
         <div className=" w-[3rem] h-[3rem] rounded-full border-2 border-primary overflow-hidden">
-          <img
+          <Image
             src={user?.avatar?.url}
             alt="admin_image"
             className=" w-full h-full object-cover"
@@ -107,7 +104,7 @@ const QA: FC<Props> = ({
                 {/* QUESTIONS */}
                 {/* image profile */}
                 <div className=" w-[2.3rem] h-[2.3rem] rounded-full border-2 border-primary overflow-hidden">
-                  <img
+                  <Image
                     src={question?.user?.avatar?.url}
                     alt="admin_image"
                     className=" w-full h-full object-cover"
@@ -213,7 +210,7 @@ const QA: FC<Props> = ({
                           >
                             {/* image profile */}
                             <div className=" w-[1.6rem] h-[1.6rem] rounded-full border-2 border-success overflow-hidden">
-                              <img
+                              <Image
                                 src={reply?.user?.avatar?.url}
                                 alt="admin_image"
                                 className=" w-full h-full object-cover"

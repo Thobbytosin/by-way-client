@@ -1,4 +1,4 @@
-import { CourseData } from "@/types/course";
+import { CourseData } from "@/types/course.types";
 
 export function getLastViewedProgress(
   progress: { videoId: string; viewed: boolean }[],

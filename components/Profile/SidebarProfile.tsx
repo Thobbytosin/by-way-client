@@ -2,9 +2,9 @@ import Image from "next/image";
 import React, { FC } from "react";
 import avatarDefault from "@/public/assets/avatar.png";
 import { FaShareAlt } from "react-icons/fa";
-import { styles } from "../../styles/style";
-import { useRouter } from "next/navigation";
+import { styles } from "@/styles/style";
 import toast from "react-hot-toast";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 const sidebarLinks = [
   {
@@ -42,7 +42,7 @@ const SidebarProfile: FC<Props> = ({ active, avatar, setActive, user }) => {
     );
   };
 
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   return (
     <>
       {user && (
@@ -112,7 +112,7 @@ const SidebarProfile: FC<Props> = ({ active, avatar, setActive, user }) => {
                 }`}
                 onClick={() => {
                   setActive(4);
-                  router.push("/admin");
+                  navigate("/admin");
                 }}
               >
                 Admin Dashboard

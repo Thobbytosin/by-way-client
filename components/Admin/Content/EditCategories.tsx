@@ -1,44 +1,37 @@
-import { AddCircleIcon, DeleteIcon } from "../../../icons/icons";
-import {
-  useEditLayoutMutation,
-  useGetHeroDataQuery,
-} from "../../../redux/layout/layoutApi";
+import { AddCircleIcon, DeleteIcon } from "@/icons/icons";
 import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast";
 import SimpleLoader from "../../SimpleLoader/SimpleLoader";
+import {
+  useContentMutations,
+  useContentQueries,
+} from "@/hooks/api/content.api";
 
-type Props = {};
-
-const EditCategories = (props: Props) => {
-  const { data, refetch } = useGetHeroDataQuery("Categories", {
-    refetchOnMountOrArgChange: true,
+const EditCategories = () => {
+  const { contentDomainData } = useContentQueries({
+    categories: true,
   });
-  const [categories, setCategories] = useState<any[]>([]);
-  const [editLayout, { isSuccess, isLoading, error }] = useEditLayoutMutation();
+  const { categories: categoriesData } = contentDomainData;
+
+  const { updateCategoriesDomain } = useContentMutations();
+  const { updateCategories, updateCategoriesPending } = updateCategoriesDomain;
+
+  const [categories, setCategories] = useState<
+    { title: string; _id?: string }[]
+  >([]);
 
   // fetch data
   useEffect(() => {
-    if (data) {
-      setCategories(data.layout.categories);
+    if (categoriesData) {
+      setCategories(categoriesData);
     }
-
-    if (isSuccess) {
-      refetch();
-      toast.success("Categories Updated");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [data, isSuccess, error, refetch]);
+  }, [categoriesData]);
 
   // delete category
   const handleDeleteCategory = (index: number) => {
-    const updateCategories = categories?.filter((_, i) => i !== index);
-    setCategories(updateCategories);
+    const updatedCategories = categories?.filter((_, i) => i !== index);
+    setCategories(updatedCategories);
+
+    updateCategories({ type: "Categories", categories: updatedCategories });
   };
 
   // add new category
@@ -57,8 +50,8 @@ const EditCategories = (props: Props) => {
 
   // check if categories are unchanged
   const areCategoriesUnchanged = (
-    oldCategories: any[],
-    newCategories: any[]
+    oldCategories: { title: string }[],
+    newCategories: { title: string }[]
   ) => {
     return JSON.stringify(oldCategories) === JSON.stringify(newCategories);
   };
@@ -69,13 +62,13 @@ const EditCategories = (props: Props) => {
   };
 
   // save changes
-  const handleSave = async () => {
-    await editLayout({ type: "Categories", categories });
+  const handleSave = () => {
+    updateCategories({ type: "Categories", categories });
   };
 
   return (
-    <div className=" p-10">
-      <h1 className=" font-semibold text-4xl">All Categories</h1>
+    <div className=" py-10">
+      <h1 className=" font-semibold text-xl">All Categories</h1>
       <div className="mt-8">
         {categories?.map((category, i) => (
           <div
@@ -92,11 +85,11 @@ const EditCategories = (props: Props) => {
               }
             />
             {/* delete button */}
-            {categories.length > 1 && !isLoading && (
+            {categories?.length > 1 && !updateCategoriesPending && (
               <DeleteIcon
                 onClick={() => handleDeleteCategory(i)}
                 color="warning"
-                fontSize="large"
+                fontSize="small"
                 style={{ cursor: "pointer" }}
               />
             )}
@@ -104,25 +97,27 @@ const EditCategories = (props: Props) => {
         ))}
 
         <AddCircleIcon
-          style={{ marginTop: "42px", fontSize: "50px", cursor: "pointer" }}
+          style={{ marginTop: "42px", fontSize: "30px", cursor: "pointer" }}
           onClick={handleAddNewCategory}
         />
       </div>
 
       {/* button */}
-      <div className=" w-full  flex justify-start mt-40 ">
-        {isLoading ? (
+      <div className=" w-full  flex justify-start mt-10 ">
+        {updateCategoriesPending ? (
           <SimpleLoader isAdmin />
         ) : (
           <button
-            className={` text-lg px-6 py-2 ${
-              areCategoriesUnchanged(data?.layout.categories, categories) ||
+            className={` text-sm px-6 py-2 ${
+              (categoriesData &&
+                areCategoriesUnchanged(categoriesData, categories)) ||
               isAnyCategoryEmpty()
                 ? "bg-secondary dark:bg-white dark:text-secondary text-white opacity-70 cursor-not-allowed "
                 : "cursor-pointer bg-primary text-white"
             }  rounded-md text-center`}
             onClick={
-              areCategoriesUnchanged(data?.layout.categories, categories) ||
+              (categoriesData &&
+                areCategoriesUnchanged(categoriesData, categories)) ||
               isAnyCategoryEmpty()
                 ? () => null
                 : handleSave

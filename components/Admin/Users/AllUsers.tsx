@@ -1,18 +1,13 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, FormEvent, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button, Box } from "@mui/material";
-import { DeleteIcon, EditIcon, EmailIcon } from "../../../icons/icons";
+import { DeleteIcon, EmailIcon } from "@/icons/icons";
 import { DataGrid } from "@mui/x-data-grid";
 import Loader from "../../Loader/Loader";
 import { format } from "timeago.js";
-import {
-  useDeleteUserAccountMutation,
-  useGetAllUsersQuery,
-  useUpdateUserRoleMutation,
-} from "../../../redux/user/userApi";
-import toast from "react-hot-toast";
-import UpdateUserRole from "../../../utils/UpdateUserRole";
-import DeleteUserModal from "../../../utils/DeleteUserModal";
+import UpdateUserRole from "@/utils/UpdateUserRole";
+import DeleteUserModal from "@/utils/DeleteUserModal";
+import { useUserMutations, useUserQueries } from "@/hooks/api/user.api";
 
 type Props = {
   isTeam?: boolean;
@@ -25,48 +20,30 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
   const [role, setRole] = useState("admin");
   const [userId, setUserId] = useState(null);
   const [email, setEmail] = useState("");
-  const { isLoading, data, error, refetch } = useGetAllUsersQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  const [
-    updateUserRole,
-    { isSuccess: updateSuccess, error: updateError, isLoading: updateLoading },
-  ] = useUpdateUserRoleMutation();
-  const [
-    deleteUserAccount,
-    { isLoading: deleteLoading, isSuccess: deleteSuccess, error: deleteError },
-  ] = useDeleteUserAccountMutation();
 
-  // for update user role and for deleting user account
+  const { allUsersDomainData } = useUserQueries({ type: "all-users" });
+  const { allUsers } = allUsersDomainData;
+
+  const { infoLoading, userInfo, userInfoSuccess } = useUserMutations();
+  const { deleteUserPending, updateRolePending } = infoLoading;
+  const { deleteUser, updateRole } = userInfo;
+  const { deleteUserSuccess, updateRoleSuccess } = userInfoSuccess;
+
+  // for update user role
   useEffect(() => {
-    if (updateSuccess) {
-      refetch();
-      toast.success("Role updated");
+    if (updateRoleSuccess) {
+      setActive(false);
+    } else {
       setActive(false);
     }
-    if (updateError) {
-      if ("data" in updateError) {
-        const errorData = updateError as any;
-        toast.error(errorData.data.message);
-        setActive(false);
-      }
-    }
+  }, [updateRoleSuccess]);
 
-    if (deleteSuccess) {
-      refetch();
-      toast.success("User Deleted");
+  // for deleting user account
+  useEffect(() => {
+    if (deleteUserSuccess) {
       setOpen(false);
     }
-
-    if (deleteError) {
-      if ("data" in deleteError) {
-        const errorData = deleteError as any;
-        toast.error(errorData.data.message);
-        setOpen(false);
-      }
-    }
-  }, [updateSuccess, updateError, deleteError, deleteSuccess, refetch]);
+  }, [deleteUserSuccess]);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -118,7 +95,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
 
   // fetching users
   if (isTeam) {
-    const newData = data?.users?.filter((user: any) => user.role === "admin");
+    const newData = allUsers?.filter((user: any) => user.role === "admin");
     if (newData) {
       newData.forEach((user: any) => {
         rows.push({
@@ -132,8 +109,8 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
       });
     }
   } else {
-    if (data) {
-      data.users?.forEach((user: any) => {
+    if (allUsers) {
+      allUsers.forEach((user: any) => {
         rows.push({
           id: user._id,
           name: user.name,
@@ -143,14 +120,6 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
           created_at: format(user.createdAt),
         });
       });
-    }
-  }
-
-  // error when fetching users
-  if (error) {
-    if ("data" in error) {
-      const errorData = error as any;
-      toast.error(errorData.data.message);
     }
   }
 
@@ -165,21 +134,25 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
   };
 
   // submit role change form
-  const handleSubmit = async () => {
-    const dataToSubmit = { email, role };
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
-    await updateUserRole(dataToSubmit);
+    const dataToSubmit = { email, role };
+    updateRole(dataToSubmit);
   };
 
   // delete user
-  const handleDeleteUser = async () => {
-    const id = userId;
-    await deleteUserAccount(id);
+  const handleDeleteUser = () => {
+    if (userId) {
+      deleteUser({ userId });
+    }
   };
 
   return (
     <div className={`mt-[8rem] pl-4 `}>
-      {!isLoading && !deleteLoading && (
+      {updateRolePending || deleteUserPending ? (
+        <Loader />
+      ) : (
         <Box m="20px">
           {isTeam && (
             <div className=" w-[90%] flex justify-start  ">
@@ -274,7 +247,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
       )}
 
       {/* open update role modal */}
-      {active && (
+      {active && !updateRolePending && (
         <UpdateUserRole
           active={active}
           setActive={setActive}
@@ -283,24 +256,18 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
           handleRoleChange={handleRoleChange}
           email={email}
           handleEmailChange={handleEmailChange}
-          loading={updateLoading}
+          loading={updateRolePending}
         />
       )}
 
       {/* open delete user modal */}
-      {open && !deleteLoading && (
+      {open && !deleteUserPending && (
         <DeleteUserModal
           open={open}
           setOpen={setOpen}
           handleDelete={handleDeleteUser}
         />
       )}
-
-      {/* loading */}
-      {isLoading && <Loader />}
-
-      {/* delete Loading */}
-      {deleteLoading && <Loader />}
     </div>
   );
 };

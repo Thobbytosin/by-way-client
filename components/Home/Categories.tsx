@@ -1,8 +1,7 @@
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import React, { FC } from "react";
 import Loader from "../Loader/Loader";
 import CategoriesCard from "../Categories/CategoriesCard";
-import { CategoriesContent } from "@/types/content";
 
 type Props = {
   isLoading: boolean | undefined;

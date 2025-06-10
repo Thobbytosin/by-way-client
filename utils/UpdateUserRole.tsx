@@ -1,6 +1,6 @@
-import React, { FC, useState } from "react";
-import { styles } from "../styles/style";
-import SimpleLoader from "../components/SimpleLoader/SimpleLoader";
+import React, { FC } from "react";
+import { styles } from "@/styles/style";
+import SimpleLoader from "@/components/SimpleLoader/SimpleLoader";
 
 type Props = {
   handleSubmit: any;
@@ -50,10 +50,10 @@ const UpdateUserRole: FC<Props> = ({
             onChange={handleRoleChange}
             className={`${styles.inputStyle} text-black dark:text-white mt-4`}
           >
-            <option value="admin" className=" text-black">
+            <option value="admin" className=" text-black dark:text-white">
               Admin
             </option>
-            <option value="user" className=" text-black">
+            <option value="user" className=" text-black dark:text-white">
               User
             </option>
           </select>

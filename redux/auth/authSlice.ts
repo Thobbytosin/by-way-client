@@ -1,4 +1,4 @@
-import { AuthState } from "@/types/user";
+import { AuthState } from "@/types/user.types";
 import { createSlice } from "@reduxjs/toolkit";
 import { PersistedState } from "redux-persist";
 

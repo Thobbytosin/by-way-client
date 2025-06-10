@@ -1,50 +1,36 @@
 import React, { FC, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button, Box } from "@mui/material";
-import { DeleteIcon, EditIcon } from "../../../icons/icons";
+import { DeleteIcon, EditIcon } from "@/icons/icons";
 import { DataGrid } from "@mui/x-data-grid";
-import {
-  useDeleteCourseMutation,
-  useGetAllCoursesQuery,
-} from "../../../redux/course/courseApi";
 import Loader from "../../Loader/Loader";
 import { format } from "timeago.js";
-import toast from "react-hot-toast";
-import DeleteCourseModal from "../../../utils/DeleteCourseModal";
-import { useRouter } from "next/navigation";
+import DeleteCourseModal from "@/utils/DeleteCourseModal";
+import { useCourseMutations, useCourseQueries } from "@/hooks/api/course.api";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {};
 
 const AllCourses: FC<Props> = () => {
-  const router = useRouter();
-  const { setTheme, theme } = useTheme();
+  const { navigate } = useRouteLoader();
+  const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [courseId, setCourseId] = useState(null);
-  const { isLoading, data, error, refetch } = useGetAllCoursesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  const [
-    deleteCourse,
-    { isSuccess: deleteSuccess, isLoading: deleteLoading, error: deleteError },
-  ] = useDeleteCourseMutation();
+  const { allCoursesDomain } = useCourseQueries({ type: "all-courses" });
+  const { allCourses, allCoursesLoading } = allCoursesDomain;
+
+  const { courseInfo, courseInfoPending, courseInfoSuccess } =
+    useCourseMutations();
+  const { deleteCourse } = courseInfo;
+  const { deleteCoursePending } = courseInfoPending;
+  const { deleteCourseSuccess } = courseInfoSuccess;
 
   // update course
   useEffect(() => {
-    if (deleteSuccess) {
-      refetch();
-      toast.success("Course deleted");
+    if (deleteCourseSuccess) {
       setOpen(false);
     }
-
-    if (deleteError) {
-      if ("data" in deleteError) {
-        const errorData = deleteError as any;
-        toast.error(errorData.data.message);
-        setOpen(false);
-      }
-    }
-  }, [deleteSuccess, deleteError, refetch]);
+  }, [deleteCourseSuccess]);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -61,7 +47,7 @@ const AllCourses: FC<Props> = () => {
         return (
           <>
             <Button
-              onClick={() => router.push(`/admin/edit-course/${params.row.id}`)}
+              onClick={() => navigate(`/admin/edit-course/${params.row.id}`)}
             >
               <EditIcon fontSize="small" />
             </Button>
@@ -93,8 +79,8 @@ const AllCourses: FC<Props> = () => {
   const rows: any = [];
 
   // fetching courses
-  if (data) {
-    data.courses?.forEach((item: any) => {
+  if (allCourses) {
+    allCourses?.forEach((item: any) => {
       rows.push({
         id: item._id,
         title: item.name,
@@ -106,23 +92,18 @@ const AllCourses: FC<Props> = () => {
     });
   }
 
-  // error fetching courses
-  if (error) {
-    if ("data" in error) {
-      const errorData = error as any;
-      toast.error(errorData.data.message);
-    }
-  }
-
   // delete course
-  const handleDeleteCourse = async () => {
-    const id = courseId;
-    await deleteCourse(id);
+  const handleDeleteCourse = () => {
+    if (courseId) {
+      deleteCourse({ courseId });
+    }
   };
 
   return (
     <div className={`mt-[8rem] pl-4 `}>
-      {!isLoading && !deleteLoading && (
+      {allCoursesLoading || deleteCoursePending ? (
+        <Loader />
+      ) : (
         <Box m="20px">
           <Box
             m="40px 0 0 0"
@@ -181,19 +162,13 @@ const AllCourses: FC<Props> = () => {
       )}
 
       {/* open delete course modal */}
-      {open && !deleteLoading && (
+      {open && !deleteCoursePending && (
         <DeleteCourseModal
           open={open}
           setOpen={setOpen}
           handleDelete={handleDeleteCourse}
         />
       )}
-
-      {/* loading */}
-      {isLoading && <Loader />}
-
-      {/* delete loading */}
-      {deleteLoading && <Loader />}
     </div>
   );
 };

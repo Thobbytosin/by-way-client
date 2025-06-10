@@ -3,9 +3,9 @@ import {
   ArrowRightAltIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-} from "../../icons/icons";
-import { styles } from "../../styles/style";
-import Ratings from "../../utils/Ratings";
+} from "@/icons/icons";
+import { styles } from "@/styles/style";
+import Ratings from "@/utils/Ratings";
 import { format } from "timeago.js";
 import Image from "next/image";
 

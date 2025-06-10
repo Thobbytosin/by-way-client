@@ -1,13 +1,14 @@
-import { NotificationsNoneIcon } from "../../icons/icons";
-import ThemeSwitcher from "../../utils/ThemeSwitcher";
-import {
-  useGetAllNotificationsQuery,
-  useUpdateNotificationStatusMutation,
-} from "../../redux/notification/notificationApi";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { NotificationsNoneIcon } from "@/icons/icons";
+import ThemeSwitcher from "@/utils/ThemeSwitcher";
 import React, { useEffect, useState } from "react";
 import { format } from "timeago.js";
 
 import socketID from "socket.io-client";
+import {
+  useNotificationMutations,
+  useNotificationQueries,
+} from "@/hooks/api/notification.api";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "";
 const socketId = socketID(ENDPOINT, { transports: ["websocket"] });
@@ -15,13 +16,12 @@ const socketId = socketID(ENDPOINT, { transports: ["websocket"] });
 type Props = {};
 
 const DashboardHeader = (props: Props) => {
-  const [close, setClose] = useState(false);
   const [hover, setHover] = useState(false);
-  const { data, refetch } = useGetAllNotificationsQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  });
-  const [updateNotificationStatus, { isSuccess, isLoading }] =
-    useUpdateNotificationStatusMutation();
+  const { updateNotificationDomain } = useNotificationMutations();
+  const { updateNotificationStatus } = updateNotificationDomain;
+  const { notificationsDomain } = useNotificationQueries();
+  const { notifications: notificationsData, notificationSuccess } =
+    notificationsDomain;
   const [notifications, setNotifications] = useState<any>([]);
 
   const [audio] = useState(
@@ -34,27 +34,23 @@ const DashboardHeader = (props: Props) => {
     audio.play();
   };
 
-  const handleNotificationStatusChange = async (id: string) => {
-    await updateNotificationStatus(id);
-  };
-
   useEffect(() => {
-    if (data) {
+    if (notificationSuccess) {
       setNotifications(
-        data.notifications.filter((item: any) => item.status === "unread")
+        notificationsData.filter((item: any) => item.status === "unread")
       );
     }
-    if (isSuccess) {
-      refetch();
-    }
-  }, [data, isSuccess, refetch]);
+  }, [notificationSuccess]);
 
   useEffect(() => {
     socketId.on("newNotification", (data) => {
       playNotificationSound();
-      refetch(); // refetch all notifications
     });
-  }, [refetch]);
+
+    return () => {
+      socketId.off("newNotification");
+    };
+  }, []);
 
   return (
     <div className=" flex gap-2 items-center justify-end fixed top-2 right-0 p-8 z-[99]  ">
@@ -83,7 +79,9 @@ const DashboardHeader = (props: Props) => {
                 <div className=" w-full flex items-center justify-between mb-2">
                   <p className=" font-semibold my-2">{item.title}</p>
                   <p
-                    onClick={() => handleNotificationStatusChange(item._id)}
+                    onClick={() =>
+                      updateNotificationStatus({ notificationId: item._id })
+                    }
                     className=" cursor-pointer text-sm text-success font-medium"
                   >
                     Mark as read

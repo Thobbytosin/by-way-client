@@ -12,7 +12,7 @@ export const styles = {
   flexCenterCenter: "flex justify-center items-center",
   labelTag: "text-sm font-medium",
   inputStyle:
-    "w-full text-md  bg-transparent border-[1.4px] border-gray-500 rounded-md p-2 mt-2 outline-none",
+    "w-full text-md  bg-gray-200 dark:bg-black border-[1.4px] border-gray-500 rounded-md p-2 mt-2 outline-none",
   dashCardStyle:
     "w-full min-h-[100px] rounded-lg bg-white dark:bg-[#0B1739] p-4 shadow-sm dark:shadow-md shadow-gray-600 dark:shadow-black",
   cardTrendDown:

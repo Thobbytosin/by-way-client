@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { AddIcon, ChevronRightIcon, RemoveIcon } from "../../icons/icons";
-import { styles } from "../../styles/style";
+import { AddIcon, ChevronRightIcon, RemoveIcon } from "@/icons/icons";
+import { styles } from "@/styles/style";
 import supportBanner from "@/public/assets/supportBanner.png";
 import call from "@/public/assets/call.png";
 import Image from "next/image";
@@ -22,8 +22,6 @@ const Support = (props: Props) => {
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
-
-  console.log("CONTENT DOMAIN DATA", contentDomainData);
 
   // Handle toggle functionality
   const handleToggleAnswer = (id: any) => {

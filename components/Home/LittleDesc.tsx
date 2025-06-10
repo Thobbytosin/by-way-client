@@ -1,4 +1,4 @@
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import React from "react";
 import littleDescIcon from "@/public/assets/littleDesc.png";
 import Image from "next/image";

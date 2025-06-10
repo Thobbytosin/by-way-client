@@ -1,9 +1,8 @@
-import { CheckIcon } from "../../../icons/icons";
+import { CheckIcon } from "@/icons/icons";
 import React, { FC } from "react";
 
 type Props = {
   active: number;
-  setActive: (value: number) => void;
 };
 
 const options = [
@@ -13,7 +12,7 @@ const options = [
   { id: 4, title: "Course Preview" },
 ];
 
-const CourseOptions: FC<Props> = ({ active, setActive }) => {
+const CourseOptions: FC<Props> = ({ active }) => {
   return (
     <div className=" flex items-center gap-6">
       {options.map((option, index) => (

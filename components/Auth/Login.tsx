@@ -8,7 +8,7 @@ import {
   AiOutlineEyeInvisible,
   AiFillGithub,
 } from "react-icons/ai";
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";

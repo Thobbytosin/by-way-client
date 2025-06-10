@@ -1,4 +1,3 @@
-import { useGetOrdersAnalyticsQuery } from "../../redux/analytics/analyticsApi";
 import React, { useState } from "react";
 import {
   ResponsiveContainer,
@@ -12,8 +11,9 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { InventoryIcon, PaidIcon, TrendingUpIcon } from "../../icons/icons";
-import { styles } from "../../styles/style";
+import { InventoryIcon, PaidIcon, TrendingUpIcon } from "@/icons/icons";
+import { styles } from "@/styles/style";
+import { useAnalyticsQueries } from "@/hooks/api/analytics.api";
 
 type Props = {};
 
@@ -25,7 +25,9 @@ const monthDataOptions = [
 ];
 
 const Analytics = (props: Props) => {
-  const { data, isLoading } = useGetOrdersAnalyticsQuery({});
+  const { ordersAnalyticsDomain } = useAnalyticsQueries({ type: "orders" });
+  const { ordersAnalytics, ordersAnalyticsLoading } = ordersAnalyticsDomain;
+
   const [monthData, setMonthData] = useState(monthDataOptions[0]);
 
   const analyticsData = [
@@ -42,14 +44,6 @@ const Analytics = (props: Props) => {
     { name: "Apr 2024", uv: 4, pv: 6 },
     { name: "May 2024", uv: 5, pv: 7 },
   ];
-
-  //   const analyticsData: any = [];
-
-  //   if (data) {
-  //     data?.orders?.last12Months.forEach((d: any) => {
-  //       analyticsData.push({ name: d.month, uv: d.count });
-  //     });
-  //   }
 
   const minValue = 0;
 
@@ -109,7 +103,7 @@ const Analytics = (props: Props) => {
         </div>
 
         {/* charts */}
-        {!isLoading && (
+        {!ordersAnalyticsLoading && (
           <div className=" w-full h-screen flex justify-center items-center my-8 py-6 ">
             <ResponsiveContainer width="100%" height="70%">
               <AreaChart width={730} height={250} data={analyticsData}>

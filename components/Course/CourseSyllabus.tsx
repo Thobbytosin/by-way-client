@@ -10,11 +10,9 @@ type Props = {
 };
 
 const CourseSyllabus: React.FC<Props> = ({ content }) => {
-  const [data, setData] = useState(content);
-
   // create new array
   const videoSections = Array.from(
-    new Set(data?.map((item: any) => item.videoSection))
+    new Set(content?.map((item: any) => item.videoSection))
   );
 
   interface VisibleSectionState {
@@ -31,7 +29,9 @@ const CourseSyllabus: React.FC<Props> = ({ content }) => {
   };
 
   const numberofLessonsInSection = (section: string) => {
-    const lessons = data?.filter((item: any) => item.videoSection === section);
+    const lessons = content?.filter(
+      (item: any) => item.videoSection === section
+    );
     // setNewSeparatedSection(lessons);
 
     if (lessons) {
@@ -42,7 +42,9 @@ const CourseSyllabus: React.FC<Props> = ({ content }) => {
   };
 
   const sectionTotalDuration = (section: string) => {
-    const sections = data?.filter((item: any) => item.videoSection === section);
+    const sections = content?.filter(
+      (item: any) => item.videoSection === section
+    );
     const seconds = sections?.reduce(
       (acc: number, c: any) => acc + c.videoDuration,
       0
@@ -117,7 +119,7 @@ const CourseSyllabus: React.FC<Props> = ({ content }) => {
           </h2> */}
           {visibleSection[section] && (
             <ul className=" bg-white dark:bg-black mt-2 rounded-lg">
-              {data
+              {content
                 ?.filter((s: any) => s.videoSection === section)
                 .map((item: any, index: number) => (
                   <li

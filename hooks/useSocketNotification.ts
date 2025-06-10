@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 import { useEffect, useRef } from "react";
-import { isServerOnline } from "../utils/isServerOnline";
+import { isServerOnline } from "@/utils/isServerOnline";
 
 type NotificationData = {
   title: string;

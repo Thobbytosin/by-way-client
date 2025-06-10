@@ -1,6 +1,5 @@
 import Image from "next/image";
 import React, { FC } from "react";
-import fallback from "@/public/assets/banner1.png";
 
 type Props = {
   hero:
@@ -39,13 +38,12 @@ const Hero: FC<Props> = ({ hero }) => {
       </div>
 
       {/* image */}
-      <div className=" w-full sm:w-[70%] lg:w-[50%] h-[50%]  xl:mx-0 mx-auto xl:w-[35%] xl:h-full hero_animation rounded-full xl:my-0 sm:my-20  mt-10 sm:mb-0 xl:pt-20">
+      <div className=" relative w-full sm:w-[70%] lg:w-[50%] h-[50%]  xl:mx-0 mx-auto xl:w-[35%] xl:h-full hero_animation rounded-full xl:my-0 sm:my-20  mt-10 sm:mb-0 xl:pt-20">
         <Image
           src={hero?.image?.url}
           alt="banner_image"
-          height={200}
-          width={200}
-          className=" w-full h-full object-cover"
+          fill
+          className="object-contain"
         />
       </div>
     </div>

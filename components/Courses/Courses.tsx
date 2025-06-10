@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import SearchBar from "../../utils/SearchBar";
+import SearchBar from "@/utils/SearchBar";
 import React, { FC, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CourseCard from "../Course/CourseCard";
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import Loader from "../Loader/Loader";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";

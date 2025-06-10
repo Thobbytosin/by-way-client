@@ -1,45 +1,32 @@
-import {
-  AddCircleIcon,
-  AddIcon,
-  DeleteIcon,
-  RemoveIcon,
-} from "../../../icons/icons";
-import {
-  useEditLayoutMutation,
-  useGetHeroDataQuery,
-} from "../../../redux/layout/layoutApi";
+import { AddCircleIcon, AddIcon, DeleteIcon, RemoveIcon } from "@/icons/icons";
 import React, { useEffect, useState, FC } from "react";
-import toast from "react-hot-toast";
 import SimpleLoader from "../../SimpleLoader/SimpleLoader";
+import {
+  useContentMutations,
+  useContentQueries,
+} from "@/hooks/api/content.api";
 
 type Props = {};
 
 const EditFaq: FC<Props> = () => {
-  const { data, refetch } = useGetHeroDataQuery("FAQ", {
-    refetchOnMountOrArgChange: true,
+  const { contentDomainData } = useContentQueries({
+    faq: true,
   });
-  const [questions, setQuestions] = useState<any[]>([]);
+  const { faqs } = contentDomainData;
+  const { updateFaqsDomain } = useContentMutations();
+  const { updateFaqs, updateFaqsPending } = updateFaqsDomain;
+
+  const [questions, setQuestions] = useState<
+    { question: string; answer: string; _id?: string }[]
+  >([]);
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
-  const [editLayout, { isSuccess, isLoading, error }] = useEditLayoutMutation();
 
   // fetch data
   useEffect(() => {
-    if (data) {
-      setQuestions(data.layout.faq);
+    if (faqs) {
+      setQuestions(faqs);
     }
-
-    if (isSuccess) {
-      refetch();
-      toast.success("Faqs Updated");
-    }
-
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [data, isSuccess, error, refetch]);
+  }, [faqs]);
 
   // Handle toggle functionality
   const handleToggleAnswer = (id: any) => {
@@ -55,6 +42,8 @@ const EditFaq: FC<Props> = () => {
   const handleDeleteFaq = (id: any) => {
     const updatedFaq = questions?.filter((_, index) => index !== id);
     setQuestions(updatedFaq);
+
+    updateFaqs({ type: "FAQ", faqs: updatedFaq });
   };
 
   // handle edit question / answer
@@ -81,50 +70,47 @@ const EditFaq: FC<Props> = () => {
   };
 
   // save faqs
-  const handleSave = async () => {
-    await editLayout({ type: "FAQ", faq: questions });
+  const handleSave = () => {
+    updateFaqs({ type: "FAQ", faqs: questions });
   };
 
-  // console.log(questions);
-  // console.log(activeQuestionId);
-
   return (
-    <div className="my-[8rem] w-[80%] mx-auto">
+    <div className="my-[8rem] ">
       {questions?.map((faq: any, i: number) => (
         <div key={i} className=" w-full  mt-10 ">
           <div className=" flex items-center gap-10 ">
             <div
               onClick={() => handleToggleAnswer(i)}
-              aria-disabled={isLoading}
+              aria-disabled={updateFaqsPending}
               className={`flex items-center justify-between w-full ${
-                isLoading ? "cursor-not-allowed" : "cursor-pointer"
-              } pb-10 border-b-2 border-secondary dark:border-white mr-10"`}
+                updateFaqsPending ? "cursor-not-allowed" : "cursor-pointer"
+              } pb-4 border-b border-secondary dark:border-white mr-10"`}
             >
               <input
                 type="text"
-                disabled={isLoading}
+                disabled={updateFaqsPending}
                 value={faq.question}
                 placeholder="Enter a question..."
                 onChange={(e) =>
                   handleChangeQuestionOrAnswer(i, "question", e.target.value)
                 }
-                className={`w-[90%] text-2xl outline-none border-none bg-transparent ${
-                  isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                className={`w-[90%] text-base outline-none border-none bg-transparent ${
+                  updateFaqsPending ? "cursor-not-allowed" : "cursor-pointer"
                 }`}
               />
               {activeQuestionId === i ? (
-                <RemoveIcon fontSize="large" />
+                <RemoveIcon fontSize="small" />
               ) : (
-                <AddIcon fontSize="large" />
+                <AddIcon fontSize="small" />
               )}
             </div>
 
             {/* delete button */}
-            {questions.length > 1 && !isLoading && (
+            {questions.length > 1 && !updateFaqsPending && (
               <DeleteIcon
                 onClick={() => handleDeleteFaq(i)}
                 color="warning"
-                fontSize="large"
+                fontSize="small"
                 style={{ cursor: "pointer" }}
               />
             )}
@@ -133,10 +119,10 @@ const EditFaq: FC<Props> = () => {
           {/* show answer */}
           {activeQuestionId === i && (
             <textarea
-              className={`w-full mt-3 bg-gray-300 dark:bg-dimDark p-3 text-lg outline-none ${
-                isLoading ? "cursor-not-allowed" : null
+              className={`w-full mt-3 bg-gray-300 dark:bg-dimDark p-3 text-sm outline-none ${
+                updateFaqsPending ? "cursor-not-allowed" : null
               }`}
-              disabled={isLoading}
+              disabled={updateFaqsPending}
               placeholder="Enter the reply..."
               rows={2}
               value={faq.answer}
@@ -149,24 +135,24 @@ const EditFaq: FC<Props> = () => {
       ))}
 
       <AddCircleIcon
-        style={{ marginTop: "42px", fontSize: "50px", cursor: "pointer" }}
+        style={{ marginTop: "42px", fontSize: "30px", cursor: "pointer" }}
         onClick={handleAddNewFaqs}
       />
 
       {/* button */}
       <div className=" w-full  flex justify-end mt-20 ">
-        {isLoading ? (
+        {updateFaqsPending ? (
           <SimpleLoader isAdmin />
         ) : (
           <button
-            className={` text-lg px-6 py-2 ${
-              areFaqsUnchanged(data?.layout.faq, questions) ||
+            className={` text-sm px-6 py-2 ${
+              (faqs && areFaqsUnchanged(faqs, questions)) ||
               isAnyFaqEmpty(questions)
                 ? "bg-secondary dark:bg-white dark:text-secondary text-white opacity-70 cursor-not-allowed "
                 : "cursor-pointer bg-primary text-white"
             }  rounded-md text-center`}
             onClick={
-              areFaqsUnchanged(data?.layout.faq, questions) ||
+              (faqs && areFaqsUnchanged(faqs, questions)) ||
               isAnyFaqEmpty(questions)
                 ? () => null
                 : handleSave

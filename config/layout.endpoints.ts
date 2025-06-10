@@ -1,6 +1,7 @@
 import { API_LAYOUT_PATHS } from "./api.routes";
 
-////////////////////////////////// USER ENDPOINTS
+////////////////////////////////// LAYOUT ENDPOINTS
 const GETLAYOUTTYPE = `${API_LAYOUT_PATHS.GETLAYOUTTYPE}`;
+const EDITLAYOUT = `${API_LAYOUT_PATHS.EDITLAYOUT}`;
 
-export { GETLAYOUTTYPE };
+export { GETLAYOUTTYPE, EDITLAYOUT };

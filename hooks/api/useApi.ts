@@ -1,5 +1,5 @@
 import { SERVER_URI } from "@/config/api";
-import { ApiError, ApiResponse } from "@/types/api";
+import { ApiError, ApiResponse } from "@/types/api.types";
 import axiosInstance from "@/utils/axiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -63,6 +63,7 @@ interface MutationOptions<TResponse, TRequest = unknown> {
   url: string;
   method: "POST" | "PUT" | "DELETE";
   params?: string;
+  paramKey?: keyof TRequest;
   headers?: Record<string, string>;
   skipAuthRefresh?: boolean;
   onSuccess: (data: ApiResponse<TResponse>) => void;
@@ -76,21 +77,37 @@ export function useMutateData<TResponse, TRequest = unknown>({
   mutationKey,
   skipAuthRefresh = true,
   params,
+  paramKey,
   onSuccess,
   onError,
 }: MutationOptions<TResponse, TRequest>) {
   return useMutation<ApiResponse<TResponse>, ApiError, TRequest>({
     mutationKey: [...mutationKey],
     mutationFn: async (data: TRequest) => {
+      let dynamicParams = params;
+
+      if (
+        paramKey &&
+        typeof data === "object" &&
+        data !== null &&
+        paramKey &&
+        paramKey in data
+      ) {
+        const key = paramKey as string;
+        const value = (data as Record<string, any>)[key];
+        dynamicParams = `/${value}`;
+      }
+
       const config = {
         method,
-        url: params ? `${SERVER_URI}${url}${params}` : `${SERVER_URI}${url}`,
+        url: dynamicParams
+          ? `${SERVER_URI}${url}${dynamicParams}`
+          : `${SERVER_URI}${url}`,
         data,
         withCredentials: true,
         headers: headers || {},
         skipAuthRefresh,
       };
-
       const response = await axiosInstance<ApiResponse<TResponse>>(config);
 
       // check if response structure is correct

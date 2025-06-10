@@ -1,12 +1,11 @@
 import {
   AddCircleIcon,
-  AddIcon,
   AddLinkIcon,
   ArrowDropDownIcon,
   DeleteIcon,
   EditIcon,
-} from "../../../icons/icons";
-import { styles } from "../../../styles/style";
+} from "@/icons/icons";
+import { styles } from "@/styles/style";
 import React, { FC, useState } from "react";
 import toast from "react-hot-toast";
 

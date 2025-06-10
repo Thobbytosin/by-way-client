@@ -1,4 +1,4 @@
-import { styles } from "../../styles/style";
+import { styles } from "@/styles/style";
 import React from "react";
 import features from "@/public/assets/features.png";
 import gridsIcon from "@/public/assets/grids.png";

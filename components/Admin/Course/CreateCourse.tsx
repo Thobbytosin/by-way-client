@@ -1,21 +1,29 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import CourseOptions from "./CourseOptions";
 import CourseInformation from "./CourseInformation";
 import CourseData from "./CourseData";
 import CourseContent from "./CourseContent";
 import CoursePreview from "./CoursePreview";
-import { useCreateCourseMutation } from "../../../redux/course/courseApi";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Loader from "../../Loader/Loader";
+import { useCourseMutations } from "@/hooks/api/course.api";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {};
 
 const CreateCourse = (props: Props) => {
-  const router = useRouter();
-  const [createCourse, { isLoading, isSuccess, error }] =
-    useCreateCourseMutation();
+  const { navigate } = useRouteLoader();
+  const {
+    courseInfo: courseInfoo,
+    courseInfoPending,
+    courseInfoSuccess,
+  } = useCourseMutations();
+  const { createCourse } = courseInfoo;
+  const { createCoursePending } = courseInfoPending;
+  const { createCourseSuccess } = courseInfoSuccess;
+
   const [active, setActive] = useState(0);
+
   const [courseInfo, setCourseInfo] = useState({
     name: "",
     description: "",
@@ -48,21 +56,19 @@ const CreateCourse = (props: Props) => {
     },
   ]);
   const [courseData, setCourseData] = useState({});
-  const [form, setForm] = useState<any>();
+  const [form, setForm] = useState<FormData>();
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("Course created successfully");
-      router.push("/admin/all-courses");
+    if (createCourseSuccess) {
+      navigate("/admin/all-courses");
     }
+  }, [createCourseSuccess]);
 
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, error, router]);
+  // console.log("Info", courseInfo);
+  // console.log("Course data", courseData);
+  // console.log("Course Content data", courseContentData);
+  // console.log("Benefits ", benefits);
+  // console.log("Prerequisites ", prerequisties);
 
   // submit all data to the course data object
   const handleSubmit = async () => {
@@ -134,11 +140,9 @@ const CreateCourse = (props: Props) => {
   };
 
   // handle create course
-  const handleCourseCreate = async () => {
-    const data = form;
-
-    if (data) {
-      await createCourse(data);
+  const handleCourseCreate = () => {
+    if (form) {
+      createCourse(form);
     }
   };
 
@@ -146,9 +150,11 @@ const CreateCourse = (props: Props) => {
     <div className=" w-full relative  p-10 min-h-full ">
       {/* Course options */}
       <div className="absolute top-12 left-[2rem]">
-        <CourseOptions active={active} setActive={setActive} />
+        <CourseOptions active={active} />
       </div>
-      {active === 0 && (
+      {createCoursePending && <Loader />}
+
+      {!createCoursePending && active === 0 && (
         <CourseInformation
           active={active}
           setActive={setActive}
@@ -157,7 +163,7 @@ const CreateCourse = (props: Props) => {
         />
       )}
 
-      {active === 1 && (
+      {!createCoursePending && active === 1 && (
         <CourseData
           benefits={benefits}
           setBenefits={setBenefits}
@@ -168,7 +174,7 @@ const CreateCourse = (props: Props) => {
         />
       )}
 
-      {active === 2 && (
+      {!createCoursePending && active === 2 && (
         <CourseContent
           key={"content"}
           active={active}
@@ -179,7 +185,7 @@ const CreateCourse = (props: Props) => {
         />
       )}
 
-      {active === 3 && !isLoading && (
+      {!createCoursePending && active === 3 && (
         <CoursePreview
           active={active}
           setActive={setActive}
@@ -187,8 +193,6 @@ const CreateCourse = (props: Props) => {
           handleCourseCreate={handleCourseCreate}
         />
       )}
-
-      {isLoading && <Loader />}
     </div>
   );
 };

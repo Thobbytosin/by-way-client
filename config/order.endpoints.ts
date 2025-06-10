@@ -1,6 +1,6 @@
 import { API_ORDER_PATHS } from "./api.routes";
 
-////////////////////////////////// USER ENDPOINTS
+////////////////////////////////// ORDER ENDPOINTS
 const PAYMENTINTENT = `${API_ORDER_PATHS.PAYMENTINTENT}`;
 const STRIPEPUBLISHABLEKEY = `${API_ORDER_PATHS.STRIPEPUBLISHABLEKEY}`;
 const CREATEORDER = `${API_ORDER_PATHS.CREATEORDER}`;

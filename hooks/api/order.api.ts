@@ -1,6 +1,5 @@
 import { useMutateData } from "./useApi";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   CREATEORDER,
   PAYMENTINTENT,

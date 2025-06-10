@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 // import CourseClass from "@/components/Course/Class/CourseClass";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Loader from "@/components/Loader/Loader";
 import { useSelector } from "react-redux";
@@ -14,10 +14,10 @@ import Heading from "@/utils/Heading";
 import ServerErrorUI from "@/components/Home/ServerErrorUI";
 import Header from "@/components/Header";
 import { getLastViewedProgress } from "@/utils/helpers";
-import { CourseData } from "@/types/course";
+import { CourseData } from "@/types/course.types";
 import CourseClassContent from "@/components/Course/Class/CourseClassContent";
 import CourseClassContentList from "@/components/Course/Class/CourseClassContentList";
-import { LessonStatus } from "@/types/user";
+import { LessonStatus } from "@/types/user.types";
 
 export type SectionGroup = {
   sectionTitle: string;
@@ -25,6 +25,7 @@ export type SectionGroup = {
 };
 
 const Page = ({ params }: any) => {
+  const router = useRouter();
   const id = params.id;
   const { courseContentDomain } = useCourseQueries({
     courseId: id,
@@ -42,6 +43,16 @@ const Page = ({ params }: any) => {
     null
   );
   const [hasInitialized, setHasInitialized] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const hasUserPurchaseCourse = user?.courses.find((c) => c.courseId === id);
+    if (!hasUserPurchaseCourse) {
+      toast.error("You have not purchased this course");
+      router.push("/");
+    }
+  }, [user, id]);
 
   // group videos intp sections
   useEffect(() => {
@@ -116,6 +127,7 @@ const Page = ({ params }: any) => {
                 courseData={courseData}
                 selectedCourse={selectedCourse}
                 setSelectedCourse={setSelectedCourse}
+                groupedSections={groupedSections}
               />
 
               <CourseClassContentList

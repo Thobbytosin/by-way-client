@@ -1,4 +1,3 @@
-import { useGetOrdersAnalyticsQuery } from "../../../redux/analytics/analyticsApi";
 import React from "react";
 import {
   ResponsiveContainer,
@@ -10,40 +9,40 @@ import {
   CartesianGrid,
 } from "recharts";
 import Loader from "../../Loader/Loader";
+import { useAnalyticsQueries } from "@/hooks/api/analytics.api";
 
-type Props = {};
-
-const OrdersAnalytics = (props: Props) => {
-  const { data, isLoading } = useGetOrdersAnalyticsQuery({});
-
-  // const analyticsData = [
-  //   { name: "June 2023", uv: 3 },
-  //   { name: "July 2023", uv: 2 },
-  //   { name: "August 2023", uv: 5 },
-  //   { name: "September 2023", uv: 7 },
-  //   { name: "October 2023", uv: 2 },
-  //   { name: "November 2023", uv: 5 },
-  //   { name: "December 2023", uv: 7 },
-  // ];
+const OrdersAnalytics = () => {
+  const { ordersAnalyticsDomain } = useAnalyticsQueries({ type: "orders" });
+  const { ordersAnalytics, ordersAnalyticsError, ordersAnalyticsLoading } =
+    ordersAnalyticsDomain;
 
   const analyticsData: any = [];
 
-  if (data) {
-    data?.orders?.last12Months.forEach((d: any) => {
+  if (ordersAnalytics) {
+    ordersAnalytics.last12Months.forEach((d: any) => {
       analyticsData.push({ name: d.month, uv: d.count });
     });
   }
 
   const minValue = 0;
 
+  if (ordersAnalyticsError)
+    return (
+      <>
+        <h2>No data found</h2>
+      </>
+    );
+
   return (
-    <div className=" h-full p-10">
+    <div className=" h-full py-10">
       <div className=" mt-[50px]">
         <h1 className=" font-medium text-3xl">Orders Analytics</h1>
         <p className=" text-lg">Last 12 months analytics data</p>
       </div>
 
-      {!isLoading && data && (
+      {ordersAnalyticsLoading ? (
+        <Loader />
+      ) : (
         <div className=" w-full h-[80vh] flex justify-center items-center my-8 py-6 bg-slate-100 dark:bg-black">
           <ResponsiveContainer width="90%" height="90%" minHeight="90%">
             <AreaChart width={730} height={250} data={analyticsData}>
@@ -68,8 +67,6 @@ const OrdersAnalytics = (props: Props) => {
           </ResponsiveContainer>
         </div>
       )}
-
-      {isLoading && <Loader />}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import React, { FC } from "react";
-import { useRouter } from "next/navigation";
-import { AccessTimeIcon, GridViewIcon } from "../../icons/icons";
-import Ratings from "../../utils/Ratings";
+import { AccessTimeIcon, GridViewIcon } from "@/icons/icons";
+import Ratings from "@/utils/Ratings";
 import Image from "next/image";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {
   course: any;
@@ -26,12 +26,12 @@ export const formatSameContentTime = (course: any) => {
 };
 
 const CourseCard: FC<Props> = ({ course, i }) => {
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
 
   return (
     <div
       key={i}
-      onClick={() => router.push(`/course-details/${course._id}`)}
+      onClick={() => navigate(`/course-details/${course._id}`)}
       className=" cursor-pointer w-[220px] lg:w-[270px] h-[400px] rounded-lg bg-white  dark:bg-gray-900 p-4 hover:shadow-lg hover:border hover:border-gray-200 hover:dark:border-gray-900 transition duration-500"
     >
       {/* thumbnail */}

@@ -16,7 +16,7 @@ import { useQueryWrapper } from "./useQueryWrapper";
 import { useEffect } from "react";
 import { FETCHUSER } from "@/config/user.endpoints";
 import { useServerStatus } from "./useServerStatus";
-import { TUser } from "@/types/user";
+import { TUser } from "@/types/user.types";
 
 // AUTH GET REQUEST
 export const useAuth = () => {

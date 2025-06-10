@@ -16,23 +16,24 @@ import {
   SourceIcon,
   StreamIcon,
   WebIcon,
-} from "../../icons/icons";
-import { styles } from "../../styles/style";
+} from "@/icons/icons";
+import { styles } from "@/styles/style";
 import FolderCopy from "@mui/icons-material/FolderCopy";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter, useParams } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import React, { FC, useState } from "react";
-import avatarDefault from "../../../public/assets/avatar.png";
+import avatarDefault from "@/public/assets/avatar.png";
+import { TUser } from "@/types/user.types";
+import SmartLink from "../SmartLink";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {
   collapse: boolean;
   setCollapse: (value: boolean) => void;
-  user: any;
-  avatar: string | null;
+  user: TUser | null;
 };
 
-const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
+const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user }) => {
   const [hoverCollapse, setHoverCollapse] = useState(false);
   const [hoverDash, setHoverDash] = useState(false);
   const [hoverCourse, setHoverCourse] = useState(false);
@@ -46,7 +47,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
   const [showAnalytics, setShowAnalytics] = useState(false);
 
   const pathName = usePathname();
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   const params = useParams();
 
   return (
@@ -79,7 +80,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           <div
             onMouseEnter={() => setHoverDash(true)}
             onMouseLeave={() => setHoverDash(false)}
-            onClick={() => router.push("/admin")}
+            onClick={() => navigate("/admin")}
             className={`cursor-pointer mt-10 ${
               pathName === "/admin" && "text-primary"
             } hover:text-primary duration-300 transition relative`}
@@ -135,7 +136,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
               } transition duration-300 absolute top-[0] left-10 w-[150px] bg-black dark:bg-white bg-opacity-45`}
             >
               <span
-                onClick={() => router.push("/admin/create-course")}
+                onClick={() => navigate("/admin/create-course")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white  duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/create-course" && "bg-primary text-white"
                 }`}
@@ -144,7 +145,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
                 Add Course
               </span>
               <span
-                onClick={() => router.push("/admin/all-courses")}
+                onClick={() => navigate("/admin/all-courses")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/all-courses" && "bg-primary text-white"
                 }`}
@@ -159,7 +160,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           <div
             onMouseEnter={() => setHoverPeople(true)}
             onMouseLeave={() => setHoverPeople(false)}
-            onClick={() => router.push("/admin/users")}
+            onClick={() => navigate("/admin/users")}
             className={`cursor-pointer mt-4 ${
               pathName === "/admin/users" && "text-primary"
             } hover:text-primary duration-300 transition relative`}
@@ -182,7 +183,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           <div
             onMouseEnter={() => setHoverAdmin(true)}
             onMouseLeave={() => setHoverAdmin(false)}
-            onClick={() => router.push("/admin/manage-admin")}
+            onClick={() => navigate("/admin/manage-admin")}
             className={`cursor-pointer mt-4 ${
               pathName === "/admin/manage-admin" && "text-primary"
             } hover:text-primary duration-300 transition relative`}
@@ -237,7 +238,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
               } transition duration-300 absolute top-[0] left-10 w-[150px] bg-black dark:bg-white bg-opacity-45`}
             >
               <span
-                onClick={() => router.push("/admin/hero")}
+                onClick={() => navigate("/admin/hero")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white  duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/hero" && "bg-primary text-white"
                 }`}
@@ -246,7 +247,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
                 Hero
               </span>
               <span
-                onClick={() => router.push("/admin/faqs")}
+                onClick={() => navigate("/admin/faqs")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/faqs" && "bg-primary text-white"
                 }`}
@@ -255,7 +256,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
                 Faqs
               </span>
               <span
-                onClick={() => router.push("/admin/categories")}
+                onClick={() => navigate("/admin/categories")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/categories" && "bg-primary text-white"
                 }`}
@@ -302,7 +303,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
               } transition duration-300 absolute top-[0] left-10 w-[150px] bg-black dark:bg-white bg-opacity-45`}
             >
               <span
-                onClick={() => router.push("/admin/courses-analytics")}
+                onClick={() => navigate("/admin/courses-analytics")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white  duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/courses-analytics" &&
                   "bg-primary text-white"
@@ -312,7 +313,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
                 Courses Analytics
               </span>
               <span
-                onClick={() => router.push("/admin/users-analytics")}
+                onClick={() => navigate("/admin/users-analytics")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/users-analytics" &&
                   "bg-primary text-white"
@@ -322,7 +323,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
                 Users Analytics
               </span>
               <span
-                onClick={() => router.push("/admin/orders-analytics")}
+                onClick={() => navigate("/admin/orders-analytics")}
                 className={`w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer p-1 flex items-center gap-2 ${
                   pathName === "/admin/orders-analytics" &&
                   "bg-primary text-white"
@@ -341,16 +342,16 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           <div className={`w-full ${styles.flexBetweenCenter} `}>
             {/* Logo */}
             <div>
-              <Link href={"/"} className=" flex items-center">
+              <SmartLink href={"/"} className=" flex items-center">
                 <Image
-                  src={require("../../icon.png")}
+                  src={require("@/public/logo.png")}
                   width={18}
                   height={26}
                   alt="app_logo"
                   className="w-4 h-6"
                 />
                 <h3 className=" font-semibold text-[12px] ml-1">ByWay</h3>
-              </Link>
+              </SmartLink>
             </div>
 
             {/* toggler */}
@@ -361,7 +362,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
 
           {/* dashboard */}
           <div
-            onClick={() => router.push("/admin")}
+            onClick={() => navigate("/admin")}
             className={`w-full flex items-center gap-2 hover:text-primary duration-300 transition cursor-pointer mt-10 text-xl ${
               pathName === "/admin" && "text-primary"
             }`}
@@ -400,7 +401,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* add courses */}
           {showCourseOptions && (
             <div
-              onClick={() => router.push("/admin/create-course")}
+              onClick={() => navigate("/admin/create-course")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/create-course" && "bg-primary text-white"
               }`}
@@ -413,7 +414,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* all courses */}
           {showCourseOptions && (
             <div
-              onClick={() => router.push("/admin/all-courses")}
+              onClick={() => navigate("/admin/all-courses")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/all-courses" && "bg-primary text-white"
               }`}
@@ -425,7 +426,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
 
           {/* users */}
           <div
-            onClick={() => router.push("/admin/users")}
+            onClick={() => navigate("/admin/users")}
             className={`w-full flex items-center gap-2 hover:text-primary duration-300 transition cursor-pointer mt-4 text-xl ${
               pathName === "/admin/users" && "text-primary"
             }`}
@@ -436,7 +437,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
 
           {/* manage admin */}
           <div
-            onClick={() => router.push("/admin/manage-admin")}
+            onClick={() => navigate("/admin/manage-admin")}
             className={`w-full flex items-center gap-2 hover:text-primary duration-300 transition cursor-pointer mt-4 text-xl ${
               pathName === "/admin/manage-admin" && "text-primary"
             }`}
@@ -474,7 +475,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* hero */}
           {showContentOptions && (
             <div
-              onClick={() => router.push("/admin/hero")}
+              onClick={() => navigate("/admin/hero")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/hero" && "bg-primary text-white"
               }`}
@@ -487,7 +488,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* faqs*/}
           {showContentOptions && (
             <div
-              onClick={() => router.push("/admin/faqs")}
+              onClick={() => navigate("/admin/faqs")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/faqs" && "bg-primary text-white"
               }`}
@@ -500,7 +501,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* categories*/}
           {showContentOptions && (
             <div
-              onClick={() => router.push("/admin/categories")}
+              onClick={() => navigate("/admin/categories")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/categories" && "bg-primary text-white"
               }`}
@@ -539,7 +540,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* courses analytics */}
           {showAnalytics && (
             <div
-              onClick={() => router.push("/admin/courses-analytics")}
+              onClick={() => navigate("/admin/courses-analytics")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/courses-analytics" &&
                 "bg-primary text-white"
@@ -553,7 +554,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* users analytics*/}
           {showAnalytics && (
             <div
-              onClick={() => router.push("/admin/users-analytics")}
+              onClick={() => navigate("/admin/users-analytics")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/users-analytics" && "bg-primary text-white"
               }`}
@@ -566,7 +567,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
           {/* orders analytics */}
           {showAnalytics && (
             <div
-              onClick={() => router.push("/admin/orders-analytics")}
+              onClick={() => navigate("/admin/orders-analytics")}
               className={` w-full text-[12px] hover:bg-primary hover:text-white duration-300 transition cursor-pointer px-2 py-4 flex items-center gap-2 ${
                 pathName === "/admin/orders-analytics" &&
                 "bg-primary text-white"
@@ -588,11 +589,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
             className=" w-6 h-6 rounded-full overflow-hidden border-2 border-primary"
           >
             <Image
-              src={
-                user?.avatar || avatar
-                  ? user?.avatar?.url || avatar
-                  : avatarDefault
-              }
+              src={user?.avatar ? user?.avatar?.url : avatarDefault}
               alt="profile_image"
               width={24}
               height={24}
@@ -615,11 +612,7 @@ const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user, avatar }) => {
         <div className=" w-full flex items-center gap-2">
           <div className=" w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
             <Image
-              src={
-                user?.avatar || avatar
-                  ? user?.avatar?.url || avatar
-                  : avatarDefault
-              }
+              src={user?.avatar ? user?.avatar?.url : avatarDefault}
               alt="profile_image"
               width={40}
               height={40}

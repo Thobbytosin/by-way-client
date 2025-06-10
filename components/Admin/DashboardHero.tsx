@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import DashboardHeader from "./DashboardHeader";
 import {
   FolderCopyIcon,
   MoreHorizIcon,
@@ -8,19 +7,18 @@ import {
   TrendingDownIcon,
   TrendingUpIcon,
   VerifiedIcon,
-} from "../../icons/icons";
-import { styles } from "../../styles/style";
+} from "@/icons/icons";
+import { styles } from "@/styles/style";
 import Analytics from "./Analytics";
+import { TUser } from "@/types/user.types";
 
 type Props = {
-  user: any;
+  user: TUser | null;
 };
 
 const DashboardHero: FC<Props> = ({ user }) => {
   return (
     <div className=" w-full  h-full py-8 pr-8 ">
-      <DashboardHeader />
-
       {/* hero content */}
       <div>
         <h1 className="text-3xl font-medium">Welcome back, {user?.name} </h1>

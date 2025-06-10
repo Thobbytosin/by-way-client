@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import React, { FC } from "react";
-import { CategoryIcon, InventoryIcon, LiveHelpIcon } from "../icons/icons";
+import { CategoryIcon, InventoryIcon } from "../icons/icons";
+import SmartLink from "@/components/SmartLink";
 
 export const navItemsData = [
   {
@@ -15,8 +15,6 @@ export const navItemsData = [
     url: "/support",
     icon: <CategoryIcon fontSize="small" />,
   },
-  //   { name: "Teach ", url: "/become-an-instructor" },
-  // { name: "FAQs", url: "/faqs", icon: <LiveHelpIcon fontSize="small" /> },
 ];
 
 type Props = {
@@ -32,7 +30,7 @@ const NavItems: FC<Props> = ({ activeItem, isMobile }) => {
         <div className=" hidden md:flex gap-4 text-sm font-semibold">
           {navItemsData &&
             navItemsData.map((item, index) => (
-              <Link href={item.url} key={index} passHref>
+              <SmartLink href={item.url} key={index} passHref>
                 <span
                   className={`${
                     activeItem === index
@@ -42,7 +40,7 @@ const NavItems: FC<Props> = ({ activeItem, isMobile }) => {
                 >
                   {item.name}
                 </span>
-              </Link>
+              </SmartLink>
             ))}
         </div>
       )}
@@ -52,7 +50,7 @@ const NavItems: FC<Props> = ({ activeItem, isMobile }) => {
         <div className=" md:hidden">
           {navItemsData &&
             navItemsData.map((item, index) => (
-              <Link href={item.url} key={index} passHref>
+              <SmartLink href={item.url} key={index} passHref>
                 <div className=" flex items-center gap-4 py-4 px-6 transition border-b border-slate-200 dark:border-slate-800 duration-500 hover:bg-primary hover:text-white rounded-lg text-sm">
                   <span className=" text-slate-60">{item.icon}</span>
                   <span
@@ -65,7 +63,7 @@ const NavItems: FC<Props> = ({ activeItem, isMobile }) => {
                     {item.name}
                   </span>
                 </div>
-              </Link>
+              </SmartLink>
             ))}
         </div>
       )}

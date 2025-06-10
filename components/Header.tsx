@@ -1,16 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import React, { FC, useState } from "react";
-import SearchBar from "../utils/SearchBar";
-import NavItems from "../utils/NavItems";
-import ThemeSwitcher from "../utils/ThemeSwitcher";
+import SearchBar from "@/utils/SearchBar";
+import NavItems from "@/utils/NavItems";
+import ThemeSwitcher from "@/utils/ThemeSwitcher";
 import { FaHamburger } from "react-icons/fa";
 import Image from "next/image";
-import { styles } from "../styles/style";
+import { styles } from "@/styles/style";
 import { useSelector } from "react-redux";
 import avatar from "@/public/assets/avatar.png";
 import { useRouter } from "next/navigation";
+import SmartLink from "./SmartLink";
 
 type Props = {
   activeItem?: number | null;
@@ -68,7 +68,7 @@ const Header: FC<Props> = ({ activeItem }) => {
         <div className="w-full h-[50px]  flex items-center justify-between  gap-10">
           {/* Logo */}
           <div>
-            <Link href={"/"} className=" flex items-center">
+            <SmartLink href="/" className=" flex items-center">
               <Image
                 src={require("@/public/logo.png")}
                 width={20}
@@ -79,7 +79,7 @@ const Header: FC<Props> = ({ activeItem }) => {
               <h3 className=" font-semibold text-xs text-black dark:text-white">
                 ByWay
               </h3>
-            </Link>
+            </SmartLink>
           </div>
 
           {/* Search bar */}
@@ -102,7 +102,7 @@ const Header: FC<Props> = ({ activeItem }) => {
             {/* user profile */}
             <div className=" md:hidden block">
               {user ? (
-                <Link
+                <SmartLink
                   href={`/profile/${user?.name
                     ?.toLowerCase()
                     .replace(/\s+/g, "-")}`}
@@ -116,16 +116,16 @@ const Header: FC<Props> = ({ activeItem }) => {
                       className=" w-full h-full"
                     />
                   </div>
-                </Link>
+                </SmartLink>
               ) : (
                 <div className=" ">
-                  <Link href="/login" className=" w-full h-full">
+                  <SmartLink href="/login" className=" w-full h-full">
                     <button
                       className={`rounded-sm text-white text-xs w-20 py-2   bg-primary hover:text-primary hover:bg-transparent hover:border hover:border-primary transition duration-300`}
                     >
                       Login
                     </button>
-                  </Link>
+                  </SmartLink>
                 </div>
               )}
             </div>
@@ -153,7 +153,7 @@ const Header: FC<Props> = ({ activeItem }) => {
           {/* sign in/up & theme toggler  show only laptop*/}
           <div className=" hidden md:flex items-center ">
             {user ? (
-              <Link
+              <SmartLink
                 href={`/profile/${user?.name
                   ?.toLowerCase()
                   .replace(/\s+/g, "-")}`}
@@ -167,22 +167,22 @@ const Header: FC<Props> = ({ activeItem }) => {
                     className=" w-full h-full"
                   />
                 </div>
-              </Link>
+              </SmartLink>
             ) : (
               <div className=" flex gap-2 mr-4">
-                <Link href="/login" className=" w-full h-full">
+                <SmartLink href="/login" className=" w-full h-full">
                   <button
                     className={`rounded-sm text-white text-xs w-20 py-2   bg-primary hover:text-primary hover:bg-transparent hover:border hover:border-primary transition duration-300`}
                   >
                     Login
                   </button>
-                </Link>
+                </SmartLink>
 
-                <Link href="/register" className=" w-full h-full">
+                <SmartLink href="/register" className=" w-full h-full">
                   <button className=" rounded-sm   text-white dark:text-slate-700 bg-slate-700 dark:bg-white text-xs w-20 py-2 hover:bg-opacity-80 transition duration-300 ">
                     Sign up
                   </button>
-                </Link>
+                </SmartLink>
               </div>
             )}
 
@@ -219,7 +219,7 @@ const Header: FC<Props> = ({ activeItem }) => {
           >
             <div>
               <div className=" mb-8 ml-6">
-                <Link href={"/"} className=" flex items-center">
+                <SmartLink href={"/"} className=" flex items-center">
                   <Image
                     src={require("@/public/logo.png")}
                     alt="app_logo"
@@ -230,14 +230,14 @@ const Header: FC<Props> = ({ activeItem }) => {
                   <h3 className=" font-semibold text-xs text-black dark:text-white">
                     ByWay
                   </h3>
-                </Link>
+                </SmartLink>
               </div>
               <NavItems activeItem={activeItem} isMobile={true} />
             </div>
 
             <div className="">
               {user && (
-                <Link href="/profile">
+                <SmartLink href="/profile">
                   <div className=" flex items-center gap-3 my-10 w-full cursor-pointer transition duration-300 hover:bg-slate-200 px-6 py-3">
                     <div className="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
                       <Image
@@ -257,7 +257,7 @@ const Header: FC<Props> = ({ activeItem }) => {
                       </p>
                     </div>
                   </div>
-                </Link>
+                </SmartLink>
               )}
               <p className=" ml-6 text-xs text-black dark:text-white text-start">
                 &copy; {new Date().getFullYear()} ByWay, All Rights Reserved

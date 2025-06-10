@@ -8,8 +8,6 @@ import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import UserCourses from "./UserCourses";
 import Logout from "../Auth/Logout";
-import { useServerStatus } from "@/hooks/api/useServerStatus";
-import ServerErrorUI from "../Home/ServerErrorUI";
 import { RootState } from "@/redux/store";
 
 type Props = {};

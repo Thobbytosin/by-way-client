@@ -1,5 +1,5 @@
-import { AddCircleIcon, DeleteIcon } from "../../../icons/icons";
-import { styles } from "../../../styles/style";
+import { AddCircleIcon, DeleteIcon } from "@/icons/icons";
+import { styles } from "@/styles/style";
 import React, { FC } from "react";
 import toast from "react-hot-toast";
 

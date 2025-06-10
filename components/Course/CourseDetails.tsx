@@ -14,15 +14,15 @@ import CourseSyllabus from "./CourseSyllabus";
 import CoursePlayer from "@/utils/CoursePlayer";
 import { extras, getDiscountedPrice } from "../Admin/Course/CoursePreview";
 import PaymentModal from "./Payment/PaymentModal";
-import { useRouter } from "next/navigation";
 import SimpleLoader from "../SimpleLoader/SimpleLoader";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Course } from "@/types/course";
+import { Course } from "@/types/course.types";
 import { RootState } from "@/redux/store";
 import { useUserQueries } from "@/hooks/api/user.api";
 import avatarFallback from "@/public/assets/avatar.png";
 import Image from "next/image";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {
   course: Course | undefined;
@@ -32,7 +32,7 @@ const CourseDetails: FC<Props> = ({ course }) => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   const { adminDomainData } = useUserQueries({ type: "admin" });
   const { admin } = adminDomainData;
 
@@ -262,7 +262,7 @@ const CourseDetails: FC<Props> = ({ course }) => {
                       ? hasUserBoughtCourse
                         ? () => {
                             setLoading(true);
-                            router.push(`/course-class/${course?._id}`);
+                            navigate(`/course-class/${course?._id}`);
                           }
                         : () => {
                             setLoading(true);
@@ -271,7 +271,7 @@ const CourseDetails: FC<Props> = ({ course }) => {
                       : () => {
                           setLoading(true);
                           toast.error("You are not logged in");
-                          router.push(`/login`);
+                          navigate(`/login`);
                         }
                   }
                   className={`inline-block text-base  font-medium text-white ${

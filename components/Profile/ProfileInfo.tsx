@@ -7,7 +7,7 @@ import { AiFillCamera } from "react-icons/ai";
 import toast from "react-hot-toast";
 import Loader from "../Loader/Loader";
 import { useUserMutations } from "@/hooks/api/user.api";
-import { TUser } from "@/types/user";
+import { TUser } from "@/types/user.types";
 
 // validation schema
 const validationSchema = Yup.object().shape({

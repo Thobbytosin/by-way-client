@@ -1,4 +1,4 @@
-import { TUser } from "./user";
+import { TUser } from "./user.types";
 
 export type Review = {
   user: TUser;
@@ -14,19 +14,17 @@ export type Comment = {
 };
 
 export type CourseData = {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
   videoUrl: string;
-  videoThumbnail: object;
   videoSection: string;
   videoDescription: string;
   videoDuration: number;
-  videoPlayer: string;
   links: { title: string; url: string }[];
   objectives: { title: string }[];
   suggestion: string;
-  questions: Comment[];
+  questions?: Comment[];
 };
 
 export type Course = {
@@ -36,20 +34,25 @@ export type Course = {
   demoUrl: string;
   price: number;
   estimatedPrice: number;
-  thumbnail: { id: string; url: string };
+  thumbnail: { id: string; url: string } | string;
   tags: string;
   level: string;
-  demoVideo: object;
+  demoVideo: { id: string; url: string } | string;
   category: string;
   benefits: { title: string }[];
   prerequisites: { title: string }[];
-  reviews: Review[];
+  reviews: Review[] | never[];
   courseData: CourseData[];
   ratings: number;
   purchase: number;
 };
 
 export type CourseQueryOptions = {
-  type: "free-list" | "auth-course" | "free-course" | "course-content";
+  type:
+    | "free-list"
+    | "auth-course"
+    | "free-course"
+    | "course-content"
+    | "all-courses";
   courseId?: string;
 };

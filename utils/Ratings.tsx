@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { StarHalfIcon, StarOutlineIcon, StarRateIcon } from "../icons/icons";
+import { StarHalfIcon, StarOutlineIcon, StarRateIcon } from "@/icons/icons";
 
 type Props = {
   rating: number;

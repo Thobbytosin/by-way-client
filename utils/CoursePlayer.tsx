@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { PlayCircleFilledIcon } from "../icons/icons";
+import { PlayCircleFilledIcon } from "@/icons/icons";
 
 type Props = {
   isClass?: boolean;

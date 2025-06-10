@@ -1,17 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { FC, useEffect, useState } from "react";
-import { CancelIcon } from "../../../icons/icons";
+import { CancelIcon } from "@/icons/icons";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import Lottie from "lottie-react";
-import successAnimation from "../../../utils/successCheck.json";
-import { useRouter } from "next/navigation";
+import successAnimation from "@/utils/successCheck.json";
 import { useOrderMutations, useOrderQueries } from "@/hooks/api/order.api";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
-import { Course } from "@/types/course";
+import { Course } from "@/types/course.types";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import InLineLoader from "@/components/Loader/InlineLoader";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 type Props = {
   open: boolean;
@@ -22,7 +22,7 @@ type Props = {
 
 const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
   const [orderSuccessModal, setOrderSuccessModal] = useState(false);
   const { paymentIntentDomain } = useOrderMutations();
   const {
@@ -106,7 +106,7 @@ const PaymentModal: FC<Props> = ({ open, setOpen, course, setLoading }) => {
           </p>
           {/* button */}
           <button
-            onClick={() => router.push(`/course-class/${course?._id}`)}
+            onClick={() => navigate(`/course-class/${course?._id}`)}
             className="mt-3 sm:mt-6 px-8 sm:py-3 py-2 text-base lg:text-lg font-medium text-white bg-success rounded-3xl transition duration-300 hover:opacity-85"
           >
             Proceed to Course

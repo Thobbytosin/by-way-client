@@ -15,6 +15,9 @@ export const API_USER_PATHS = {
   GETADMINLIST: "/get-admin-list",
   GETADMIN: "/get-admin",
   UPDATEVIEWEDLESSON: "/update-user-videos-viewed",
+  GETALLUSERSADMIN: "/get-all-users",
+  UPDATEUSERROLE: "/update-user-role",
+  DELETEUSERBYID: "/delete-user",
 };
 
 export const API_COURSES_PATHS = {
@@ -26,14 +29,30 @@ export const API_COURSES_PATHS = {
   ADDREPLYTOQUESTION: "/add-answer",
   ADDCOURSEREVIEWBYID: "/add-review",
   ADDREPLTYTOCOURSEREVIEWBYID: "/add-reply-review",
+  GETALLCOURSESADMIN: "/get-all-courses",
+  DELETECOURSEBYID: "/delete-course",
+  CREATECOURSE: "/create-course",
+  EDITCOURSEBYID: "/edit-course",
 };
 
 export const API_LAYOUT_PATHS = {
   GETLAYOUTTYPE: "/get-layout",
+  EDITLAYOUT: "/edit-layout",
 };
 
 export const API_ORDER_PATHS = {
   PAYMENTINTENT: "/payment",
   STRIPEPUBLISHABLEKEY: "/payment/stripe-publishable-key",
   CREATEORDER: "/create-order",
+};
+
+export const API_NOTIFICATION_PATHS = {
+  UPDATENOTIFCATIONSTATUS: "/update-notification-status",
+  GETALLNOTIFCATIONS: "/get-all-notifications",
+};
+
+export const API_ANALYTICS_PATHS = {
+  GETORDERSANALYTICS: "/get-orders-analytics",
+  GETUSERSANALYTICS: "/get-users-analytics",
+  GETCOURSESANALYTICS: "/get-courses-analytics",
 };

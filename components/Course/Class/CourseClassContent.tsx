@@ -3,13 +3,10 @@ import {
   AccessTimeIcon,
   LockIcon,
   NotInterestedIcon,
-  PlayArrowIcon,
   ReplyIcon,
-  SchoolIcon,
   StarOutlineIcon,
   StarRateIcon,
   VerifiedIcon,
-  WorkspacePremiumIcon,
 } from "@/icons/icons";
 import { styles } from "@/styles/style";
 import CoursePlayer from "@/utils/CoursePlayer";
@@ -20,16 +17,17 @@ import { format } from "timeago.js";
 import Ratings from "@/utils/Ratings";
 import Image from "next/image";
 import congratulationsGif from "@/../public/assets/congratulations.gif";
-import { useRouter } from "next/navigation";
 import CourseClassContentList from "./CourseClassContentList";
 import { useSocketNotification } from "@/hooks/useSocketNotification";
 import { useUserMutations, useUserQueries } from "@/hooks/api/user.api";
 import { useCourseMutations, useCourseQueries } from "@/hooks/api/course.api";
 import avatarFallback from "@/public/assets/avatar.png";
-import { CourseData } from "@/types/course";
+import { CourseData } from "@/types/course.types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { LessonStatus } from "@/types/user";
+import { LessonStatus } from "@/types/user.types";
+import { SectionGroup } from "@/app/course-class/[id]/page";
+import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 
 const subTags = ["Details", "Qs & As", "Reviews"];
 
@@ -43,6 +41,7 @@ type Props = {
   courseData: CourseData[];
   selectedCourse: LessonStatus | null;
   setSelectedCourse: (value: LessonStatus | null) => void;
+  groupedSections: SectionGroup[];
 };
 
 const CourseClassContent: FC<Props> = ({
@@ -55,10 +54,11 @@ const CourseClassContent: FC<Props> = ({
   courseData,
   selectedCourse,
   setSelectedCourse,
+  groupedSections,
 }) => {
   const { user } = useSelector((state: RootState) => state.auth);
   // NEXT PACKAGES
-  const router = useRouter();
+  const { navigate } = useRouteLoader();
 
   // SOCKET IO
   const { emitNotification } = useSocketNotification();
@@ -337,7 +337,9 @@ const CourseClassContent: FC<Props> = ({
         }
 
         // sent to backend
-        updateViewedLesson({ courseId, videoId: currentVideo._id });
+        if (courseId && currentVideo._id) {
+          updateViewedLesson({ courseId, videoId: currentVideo._id });
+        }
       }
 
       const nextIndex = activeIndex + 1;
@@ -377,7 +379,9 @@ const CourseClassContent: FC<Props> = ({
       }
 
       // sent to backend
-      updateViewedLesson({ courseId, videoId: currentVideo._id });
+      if (courseId && currentVideo._id) {
+        updateViewedLesson({ courseId, videoId: currentVideo._id });
+      }
 
       setShowCompletedModal(true);
     }
@@ -467,66 +471,23 @@ const CourseClassContent: FC<Props> = ({
           {/* mobile and tablet - course content */}
           {activeTag === 3 && (
             <div className="block lg:hidden my-10">
-              {/* instructor */}
-              <div className=" w-full border-t border-gray-300 dark:border-gray-800 mt-8 py-8">
-                {/* instructor */}
-                <div className=" border-b border-gray-300 dark:border-gray-800 pb-8 mb-8">
-                  {/* descriptions */}
-                  <h3 className={styles.detailsSubTagHeading}>Instructor</h3>
-
-                  <h3 className=" text-base font-medium text-primary leading-7">
-                    {admin?.name}
-                  </h3>
-                  <p className="text-sm font-semibold">Teacher</p>
-
-                  {/* teacher avatar */}
-                  <div className="flex items-center gap-3 mt-6">
-                    <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-primary overflow-hidden">
-                      <Image
-                        src={admin?.avatar?.url || avatarFallback}
-                        alt="admin_image"
-                        width={100}
-                        height={100}
-                        className=" w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className=" text-xs sm:text-sm  font-medium">
-                        <WorkspacePremiumIcon fontSize="inherit" />{" "}
-                        <span className="">1732 Reviews</span>
-                      </p>
-                      <p className="text-xs sm:text-sm font-medium mt-1.5">
-                        <SchoolIcon fontSize="inherit" />{" "}
-                        <span className="">805 Students</span>
-                      </p>
-                      <p className=" text-xs sm:text-sm  font-medium mt-1.5">
-                        <PlayArrowIcon fontSize="inherit" />{" "}
-                        <span className="">64 Courses</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* about */}
-                  <p className={`${styles.detailsDescription} mt-4`}>
-                    With over a decade of industry experience, Ronald brings a
-                    wealth of practical knowledge to the classroom. He has
-                    played a pivotal role in designing user-centric interfaces
-                    for renowned tech companies, ensuring seamless and engaging
-                    user experiences.
-                  </p>
-                </div>
-              </div>
+              {/* descriptions */}
+              <h3
+                className={`font-semibold text-xl lg:text-2xl mb-10 text-left`}
+              >
+                Course Progress
+              </h3>
 
               {/* tablets and mobile */}
-              {/* <CourseClassContentList
-                data={data}
-                courseId={courseId}
-                activeIndex={activeIndex}
-                setActiveIndex={setActiveIndex}
+              <CourseClassContentList
+                courseData={courseData}
                 activeVideo={activeVideo}
                 setActiveVideo={setActiveVideo}
-                // hideForLargeTrue
-              /> */}
+                activeIndex={activeIndex}
+                setActiveIndex={setActiveIndex}
+                groupedSections={groupedSections}
+                selectedCourse={selectedCourse}
+              />
             </div>
           )}
 
@@ -622,7 +583,7 @@ const CourseClassContent: FC<Props> = ({
               <br />
 
               {/* DISCUSSIONS */}
-              {activeVideo?.questions[0] ? (
+              {activeVideo?.questions?.[0] ? (
                 <div className="w-full border-t border-gray-300 dark:border-gray-800 mt-8 py-8">
                   <h3 className={styles.detailsSubTagHeading}>
                     Join the discussion
@@ -634,6 +595,7 @@ const CourseClassContent: FC<Props> = ({
                       <div
                         key={i}
                         className={`flex gap-2 items-start w-full  ${
+                          activeVideo.questions &&
                           i === activeVideo.questions.length - 1
                             ? "py-6"
                             : "py-6 border-b border-gray-200 dark:border-gray-800"
@@ -812,7 +774,7 @@ const CourseClassContent: FC<Props> = ({
               )}
 
               {/* SHOW MORE */}
-              {activeVideo?.questions[0] &&
+              {activeVideo?.questions?.[0] &&
                 activeVideo.questions.length > 3 && (
                   <>
                     {!showMore ? (
@@ -1252,7 +1214,7 @@ const CourseClassContent: FC<Props> = ({
                 <p className="text-center text-lg sm:text-xl mt-4 font-medium.">
                   You can check our other{" "}
                   <span
-                    onClick={() => router.push("/courses")}
+                    onClick={() => navigate("/courses")}
                     className=" text-lightGreen cursor-pointer font-semibold"
                   >
                     courses.
