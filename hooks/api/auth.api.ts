@@ -24,37 +24,11 @@ export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isOnline, isLoading: serverStatusLoading } = useServerStatus();
 
-  const [hasLoginCookie, setHasLoginCookie] = useState(false);
-
-  const value =
-    typeof window !== "undefined" &&
-    document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("_can_logged_in="))
-      ?.split("=")[1];
-
-  console.log(value);
-
-  // Check _can_logged_in cookie (only on client)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const value = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("_can_logged_in="))
-        ?.split("=")[1];
-      console.log(value);
-      setHasLoginCookie(!!value);
-      console.log("TR");
-    }
-  }, []);
-
-  console.log("HAS LOGIN", hasLoginCookie);
-
   const { data, error, loading, isSuccess } = useQueryWrapper<TUser>({
     endpoint: FETCHUSER,
     queryKey: ["user"],
     requiresAuth: true,
-    enabled: hasLoginCookie && !serverStatusLoading && isOnline,
+    enabled: !serverStatusLoading && isOnline,
   });
 
   useEffect(() => {
