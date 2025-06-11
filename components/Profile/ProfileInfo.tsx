@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import Image from "next/image";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import * as Yup from "yup";
 import avatarDefault from "@/public/assets/avatar.png";
 import { AiFillCamera } from "react-icons/ai";
@@ -22,12 +22,16 @@ type Props = {
 
 const ProfileInfo: FC<Props> = ({ user }) => {
   const { userInfo, infoLoading } = useUserMutations();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // for user profile image upload
   const handleImageChange = async (e: any) => {
     const file = e.target.files[0];
 
     if (file) {
+      const imagePreview = URL.createObjectURL(file);
+      setPreviewUrl(imagePreview);
+
       const form = new FormData();
 
       form.append("avatar", file);
@@ -66,7 +70,7 @@ const ProfileInfo: FC<Props> = ({ user }) => {
       <div className=" lg:w-[140px] lg:h-[140px] sm:w-[110px] sm:h-[110px] rounded-full border-2 border-transparent mx-auto mb-8 relative">
         <div className=" w-full h-full flex justify-center items-end overflow-hidden rounded-full">
           <Image
-            src={user?.avatar ? user?.avatar?.url : avatarDefault}
+            src={previewUrl || (user?.avatar ? user.avatar.url : avatarDefault)}
             width={140}
             height={140}
             alt="profile_image"

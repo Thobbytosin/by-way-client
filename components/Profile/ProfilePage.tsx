@@ -1,39 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Heading from "@/utils/Heading";
 import Header from "@/components/Header";
-import { useSelector } from "react-redux";
 import Profile from "@/components/Profile/Profile";
 import Loader from "@/components/Loader/Loader";
-import { RootState } from "@/redux/store";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
 import ServerErrorUI from "@/components/Home/ServerErrorUI";
-import { useRouteLoader } from "@/providers/RouteLoadingProvider";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
 type Props = {};
 
 const ProfilePage = (props: Props) => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
+  const { user, loading } = useProtectedRoute({});
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
-  const { navigate } = useRouteLoader();
 
-  useEffect(() => {
-    setIsMounted(true); // Set to true once the component is mounted
-  }, []);
+  // Show loading until user and server state are resolved
+  if (loading || serverLoading) {
+    return <Loader key="loading" />;
+  }
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/");
-    }
-  }, [user]);
+  if (!loading && !user) {
+    return <Loader key="loading" />;
+  }
 
-  if (!isMounted || !user) {
-    return <Loader key={"loading"} />;
+  // If server error
+  if (serverError) {
+    return <ServerErrorUI errorMessage={serverError} />;
   }
 
   return (
@@ -45,13 +41,7 @@ const ProfilePage = (props: Props) => {
       />
 
       <Header />
-      {serverLoading ? (
-        <Loader key={"loading"} />
-      ) : serverError ? (
-        <ServerErrorUI errorMessage={serverError} />
-      ) : (
-        <Profile />
-      )}
+      <Profile />
     </>
   );
 };

@@ -19,6 +19,7 @@ import CourseClassContent from "@/components/Course/Class/CourseClassContent";
 import CourseClassContentList from "@/components/Course/Class/CourseClassContentList";
 import { LessonStatus } from "@/types/user.types";
 import { useRouteLoader } from "@/providers/RouteLoadingProvider";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
 export type SectionGroup = {
   sectionTitle: string;
@@ -26,14 +27,18 @@ export type SectionGroup = {
 };
 
 const Page = ({ params }: any) => {
-  const { navigate } = useRouteLoader();
   const id = params.id;
+
+  const { loading, user } = useProtectedRoute({
+    requireCoursePurchase: id,
+    redirectPath: `/course-details/${id}`,
+  });
+
   const { courseContentDomain } = useCourseQueries({
     courseId: id,
     type: "course-content",
   });
   const { courseData, courseDataLoading } = courseContentDomain;
-  const { user } = useSelector((state: RootState) => state.auth);
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
@@ -44,17 +49,6 @@ const Page = ({ params }: any) => {
     null
   );
   const [hasInitialized, setHasInitialized] = useState(false);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/");
-    }
-
-    const hasUserPurchaseCourse = user?.courses.find((c) => c.courseId === id);
-    if (!hasUserPurchaseCourse) {
-      navigate("/");
-    }
-  }, [user, id]);
 
   // group videos intp sections
   useEffect(() => {
@@ -101,15 +95,20 @@ const Page = ({ params }: any) => {
       document.title = `${activeIndex + 1}. ${activeVideo.title}`;
     }
   }, [activeVideo, activeIndex]);
+
   if (courseDataLoading) {
     return <Loader key={"loading"} />;
+  }
+
+  if (!loading && !user) {
+    return <Loader key="loading" />;
   }
 
   return (
     <>
       <Header activeItem={0} />
 
-      {serverLoading ? (
+      {loading || serverLoading ? (
         <Loader key={"loading"} />
       ) : serverError ? (
         <ServerErrorUI errorMessage={serverError} />

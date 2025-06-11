@@ -93,7 +93,7 @@ export const useAuthMutations = () => {
     url: SOCIALLOGIN,
     skipAuthRefresh: true,
     onSuccess: (response) => {
-      // toast.success(response.message);
+      toast.success(response.message);
 
       dispatch(setUser(response.data?.user));
 

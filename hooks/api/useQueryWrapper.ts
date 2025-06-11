@@ -17,14 +17,21 @@ export const useQueryWrapper = <T = any>({
 }: QueryOptions) => {
   const url = params ? `${endpoint}${params}` : endpoint;
 
-  const { data, error, isLoading, isSuccess, isFetching } = useFetchData<T>({
-    method: "GET",
-    queryKey: [...queryKey],
-    url,
-    skipAuthRefresh: !requiresAuth, // check if token is needed
-    enabled,
-    // enabled: hasBeenAuthenticated && isOnline,
-  });
+  const { data, error, isLoading, isSuccess, isFetching, isFetched } =
+    useFetchData<T>({
+      method: "GET",
+      queryKey: [...queryKey],
+      url,
+      skipAuthRefresh: !requiresAuth, // check if token is needed
+      enabled,
+      // enabled: hasBeenAuthenticated && isOnline,
+    });
 
-  return { error, loading: isLoading, data, isSuccess, isFetching };
+  return {
+    error,
+    loading: isLoading || !isFetched,
+    data,
+    isSuccess,
+    isFetching,
+  };
 };

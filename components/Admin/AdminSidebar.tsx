@@ -30,7 +30,7 @@ import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 type Props = {
   collapse: boolean;
   setCollapse: (value: boolean) => void;
-  user: TUser | null;
+  user: TUser | undefined;
 };
 
 const AdminSidebar: FC<Props> = ({ setCollapse, collapse, user }) => {

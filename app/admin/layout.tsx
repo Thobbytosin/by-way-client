@@ -5,8 +5,8 @@ import AdminSidebar from "@/components/Admin/AdminSidebar";
 import DashboardHeader from "@/components/Admin/DashboardHeader";
 import ServerErrorUI from "@/components/Home/ServerErrorUI";
 import Loader from "@/components/Loader/Loader";
-import AdminProtected from "@/hooks/adminProtected";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
@@ -18,21 +18,17 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useProtectedRoute({ requireAdmin: true });
   const [collapse, setCollapse] = useState(false);
-  const { user } = useSelector((state: RootState) => state.auth);
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
-  const router = useRouter();
-  const isAdmin = user?.role === "admin";
 
-  useEffect(() => {
-    if (!user || !isAdmin) {
-      router.push("/");
-    }
-  }, [user, isAdmin]);
+  if (serverLoading || loading) return <Loader />;
 
-  if (serverLoading || !isAdmin) return <Loader />;
+  if (!loading && !user) {
+    return <Loader key="loading" />;
+  }
 
   if (serverError) return <ServerErrorUI errorMessage={serverError} />;
 

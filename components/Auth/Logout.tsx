@@ -9,7 +9,6 @@ type Props = {};
 
 const Logout: FC<Props> = () => {
   const { logoutUser } = useAuthMutations();
-  const { navigate } = useRouteLoader();
 
   const handleLogout = async () => {
     try {
