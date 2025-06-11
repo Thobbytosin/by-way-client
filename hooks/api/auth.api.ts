@@ -93,7 +93,7 @@ export const useAuthMutations = () => {
     url: SOCIALLOGIN,
     skipAuthRefresh: true,
     onSuccess: (response) => {
-      toast.success(response.message);
+      // toast.success(response.message);
 
       dispatch(setUser(response.data?.user));
 
@@ -121,11 +121,10 @@ export const useAuthMutations = () => {
     onSuccess: (response) => {
       if (!response.success) return;
 
-      toast.success(response.message);
-
+      dispatch(setUser(null));
       navigate("/");
 
-      dispatch(setUser(null));
+      toast.success(response.message);
 
       localStorage.removeItem("access_token_expiry");
 

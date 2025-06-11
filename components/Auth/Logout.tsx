@@ -13,13 +13,9 @@ const Logout: FC<Props> = () => {
 
   const handleLogout = async () => {
     try {
-      // await axios.post("/api/auth/logout");
-      // toast.success("Logged out");
-      // localStorage.removeItem("access_token_expiry");
-      // navigate("/");
-
       logoutUser(null);
-      await signOut(); // signout from google too
+
+      await signOut({ redirect: false });
     } catch (error) {}
   };
 
