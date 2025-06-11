@@ -13,17 +13,12 @@ import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 type Props = {};
 
 const ProfilePage = (props: Props) => {
-  const { user, loading } = useProtectedRoute({});
+  const { user, loading, allowedToRender } = useProtectedRoute({});
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
 
-  // Show loading until user and server state are resolved
-  if (loading || serverLoading) {
-    return <Loader key="loading" />;
-  }
-
-  if (!loading && !user) {
+  if (loading || !allowedToRender || serverLoading) {
     return <Loader key="loading" />;
   }
 

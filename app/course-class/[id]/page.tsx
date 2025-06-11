@@ -2,15 +2,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import CourseClass from "@/components/Course/Class/CourseClass";
-import { redirect, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import Loader from "@/components/Loader/Loader";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import { useCourseQueries } from "@/hooks/api/course.api";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
-import Heading from "@/utils/Heading";
 import ServerErrorUI from "@/components/Home/ServerErrorUI";
 import Header from "@/components/Header";
 import { getLastViewedProgress } from "@/utils/helpers";
@@ -18,7 +12,6 @@ import { CourseData } from "@/types/course.types";
 import CourseClassContent from "@/components/Course/Class/CourseClassContent";
 import CourseClassContentList from "@/components/Course/Class/CourseClassContentList";
 import { LessonStatus } from "@/types/user.types";
-import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
 export type SectionGroup = {
@@ -29,7 +22,7 @@ export type SectionGroup = {
 const Page = ({ params }: any) => {
   const id = params.id;
 
-  const { loading, user } = useProtectedRoute({
+  const { loading, user, allowedToRender } = useProtectedRoute({
     requireCoursePurchase: id,
     redirectPath: `/course-details/${id}`,
   });
@@ -96,11 +89,7 @@ const Page = ({ params }: any) => {
     }
   }, [activeVideo, activeIndex]);
 
-  if (courseDataLoading) {
-    return <Loader key={"loading"} />;
-  }
-
-  if (!loading && !user) {
+  if (loading || !allowedToRender) {
     return <Loader key="loading" />;
   }
 
@@ -108,7 +97,7 @@ const Page = ({ params }: any) => {
     <>
       <Header activeItem={0} />
 
-      {loading || serverLoading ? (
+      {serverLoading || courseDataLoading ? (
         <Loader key={"loading"} />
       ) : serverError ? (
         <ServerErrorUI errorMessage={serverError} />

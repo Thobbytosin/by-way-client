@@ -18,15 +18,15 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useProtectedRoute({ requireAdmin: true });
+  const { user, loading, allowedToRender } = useProtectedRoute({
+    requireAdmin: true,
+  });
   const [collapse, setCollapse] = useState(false);
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
 
-  if (serverLoading || loading) return <Loader />;
-
-  if (!loading && !user) {
+  if (loading || !allowedToRender || serverLoading) {
     return <Loader key="loading" />;
   }
 

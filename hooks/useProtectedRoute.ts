@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAuth } from "./api/auth.api";
-import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 import { useRouter } from "next/navigation";
 
 type Options = {
@@ -15,42 +14,33 @@ export const useProtectedRoute = ({
   redirectPath = "/",
 }: Options) => {
   const { data: user, loading } = useAuth();
-  const { navigate } = useRouteLoader();
   const router = useRouter();
 
+  const shouldRedirect = useMemo(() => {
+    if (loading) return false;
+
+    if (!user?.data) return true;
+
+    if (requireAdmin && user.data.role !== "admin") return true;
+
+    if (
+      requireCoursePurchase &&
+      !user.data.courses?.some((c) => c.courseId === requireCoursePurchase)
+    )
+      return true;
+
+    return false;
+  }, [loading, user?.data, requireAdmin, requireCoursePurchase]);
+
   useEffect(() => {
-    if (loading) return;
-
-    const loggedInUser = user?.data;
-
-    if (!loggedInUser) {
+    if (!loading && shouldRedirect) {
       router.push(redirectPath);
-      return;
     }
+  }, [loading, router, redirectPath, shouldRedirect]);
 
-    if (requireAdmin && loggedInUser.role !== "admin") {
-      router.push(redirectPath);
-      return;
-    }
-
-    if (requireCoursePurchase) {
-      const hasUserPurchaseCourse = loggedInUser.courses.some(
-        (c) => c.courseId === requireCoursePurchase
-      );
-
-      if (!hasUserPurchaseCourse) {
-        router.push(redirectPath);
-        return;
-      }
-    }
-  }, [
+  return {
+    user: user?.data,
     loading,
-    user?.data,
-    router,
-    redirectPath,
-    requireAdmin,
-    requireCoursePurchase,
-  ]);
-
-  return { user: user?.data, loading };
+    allowedToRender: !shouldRedirect && !loading,
+  };
 };
