@@ -24,12 +24,13 @@ export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isOnline, isLoading: serverStatusLoading } = useServerStatus();
 
-  const { data, error, loading, isSuccess } = useQueryWrapper<TUser>({
-    endpoint: FETCHUSER,
-    queryKey: ["user"],
-    requiresAuth: true,
-    enabled: !serverStatusLoading && isOnline,
-  });
+  const { data, error, isLoading, isFetched, isSuccess } =
+    useQueryWrapper<TUser>({
+      endpoint: FETCHUSER,
+      queryKey: ["user"],
+      requiresAuth: true,
+      enabled: !serverStatusLoading && isOnline,
+    });
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -39,7 +40,7 @@ export const useAuth = () => {
 
   return {
     error,
-    loading,
+    loading: isLoading || !isFetched,
     data,
   };
 };

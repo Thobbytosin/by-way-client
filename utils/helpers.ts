@@ -48,3 +48,18 @@ export function contentTotalDuration(duration: number) {
     // : `${minutes} min.`
   }`;
 }
+
+export function getCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return;
+
+  const value = `; ${document.cookie}`;
+
+  const parts = value.split(`; ${name}=`);
+
+  if (parts.length >= 2) {
+    const part = parts.pop();
+    if (part) return part.split(";").shift();
+  }
+
+  return undefined;
+}

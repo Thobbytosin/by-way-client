@@ -29,9 +29,11 @@ export const useQueryWrapper = <T = any>({
 
   return {
     error,
-    loading: isLoading || !isFetched,
+    loading: isLoading,
+    isLoading,
     data,
     isSuccess,
     isFetching,
+    isFetched,
   };
 };

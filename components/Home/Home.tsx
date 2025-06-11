@@ -21,6 +21,8 @@ import { useCourseQueries } from "@/hooks/api/course.api";
 import { useUserQueries } from "@/hooks/api/user.api";
 import { useServerStatus } from "@/hooks/api/useServerStatus";
 import { styles } from "@/styles/style";
+import { getCookie } from "@/utils/helpers";
+import CookiesConsent from "../CookiesConsent";
 
 const Home = () => {
   const [isMounted, setIsMounted] = useState(false); // Track if component is mounted
@@ -38,10 +40,24 @@ const Home = () => {
   const { error: serverError, isLoading: serverLoading } = useServerStatus({
     checkInterval: 10000,
   });
+  const [showConsent, setShowConsent] = useState(false);
 
   useEffect(() => {
     setIsMounted(true); // Set to true once the component is mounted
   }, []);
+
+  // for cookie consent
+  useEffect(() => {
+    if (!isMounted) return;
+    if (typeof window === "undefined") return;
+
+    const consent = getCookie("cookie_consent");
+
+    if (!consent) {
+      setShowConsent(true);
+      return;
+    }
+  }, [isMounted]);
 
   // fetch user latest role
   const fetchUsersData = (userId: string) => {
@@ -111,6 +127,8 @@ const Home = () => {
             <Footer />
           </>
         )}
+
+        {showConsent && <CookiesConsent setShowConsent={setShowConsent} />}
       </div>
     </>
   );
