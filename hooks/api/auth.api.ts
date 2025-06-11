@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useMutateData } from "./useApi";
 import { AppDispatch } from "@/redux/store";
 import { useQueryWrapper } from "./useQueryWrapper";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FETCHUSER } from "@/config/user.endpoints";
 import { useServerStatus } from "./useServerStatus";
 import { TUser } from "@/types/user.types";
@@ -22,18 +22,30 @@ import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 // AUTH GET REQUEST
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isOnline, isLoading } = useServerStatus();
+  const { isOnline, isLoading: serverStatusLoading } = useServerStatus();
+
+  const [hasLoginCookie, setHasLoginCookie] = useState(false);
+
+  // Check _can_logged_in cookie (only on client)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const value = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("_can_logged_in="));
+      setHasLoginCookie(!!value);
+    }
+  }, []);
 
   const { data, error, loading, isSuccess } = useQueryWrapper<TUser>({
     endpoint: FETCHUSER,
     queryKey: ["user"],
     requiresAuth: true,
-    enabled: !isLoading && isOnline,
+    enabled: hasLoginCookie && !serverStatusLoading && isOnline,
   });
 
   useEffect(() => {
     if (isSuccess && data) {
-      dispatch(setUser(data.data)); // Update Redux store
+      dispatch(setUser(data.data));
     }
   }, [isSuccess, data, dispatch]);
 
@@ -117,7 +129,7 @@ export const useAuthMutations = () => {
     method: "POST",
     mutationKey: ["logoutUser"],
     url: LOGOUT,
-    skipAuthRefresh: false,
+    skipAuthRefresh: true,
     onSuccess: (response) => {
       if (!response.success) return;
 
