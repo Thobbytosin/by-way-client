@@ -1,6 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from "axios";
 import { SERVER_URI } from "../config/api";
 import { isServerOnline } from "./isServerOnline";
+import { getCookie } from "./helpers";
 
 const axiosInstance = axios.create({
   baseURL: SERVER_URI,
@@ -34,6 +35,14 @@ axiosInstance.interceptors.request.use(async (config) => {
   if (!online) {
     return Promise.reject(new Error("Server is offline"));
   }
+
+  const consent = getCookie("cookie_consent");
+
+  // sets the cookie consent in all request headers
+  customConfig.headers = {
+    ...(customConfig.headers || {}),
+    ...(consent ? { "x-cookie-consent": consent } : {}),
+  };
 
   // refresh only if route needs tokens and tokens is expiring soon
   if (!customConfig.skipAuthRefresh && isAccessTokenExpiringSoon()) {

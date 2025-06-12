@@ -24,7 +24,7 @@ const CookiesConsent = ({ setShowConsent }: Props) => {
       setShowConsent(false);
     } else {
       consentData = {
-        reject: true,
+        accept: false,
       };
       setShowConsent(false);
     }
