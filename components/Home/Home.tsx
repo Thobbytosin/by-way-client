@@ -114,7 +114,7 @@ const Home = () => {
 
             <Features />
 
-            {usersDomainData.usersList && (
+            {usersDomainData.usersList && updatedReviews && (
               <Testimonials
                 reviews={updatedReviews}
                 fetchUsersData={fetchUsersData}

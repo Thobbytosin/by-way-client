@@ -12,7 +12,6 @@ import avatar from "@/public/assets/avatar.png";
 import SmartLink from "./SmartLink";
 import { useRouteLoader } from "@/providers/RouteLoadingProvider";
 import { RootState } from "@/redux/store";
-import InLineLoader from "./Loader/InlineLoader";
 
 type Props = {
   activeItem?: number | null;
@@ -22,7 +21,7 @@ const Header: FC<Props> = ({ activeItem }) => {
   const { navigate } = useRouteLoader();
   const [openSidebar, setOpenSidebar] = useState(false);
   const [active, setActive] = useState(false);
-  const { user, isAuthLoaded } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
@@ -98,7 +97,7 @@ const Header: FC<Props> = ({ activeItem }) => {
           <div className=" flex items-center gap-4">
             <NavItems key={1} activeItem={activeItem} isMobile={false} />
 
-            {/* mobile */}
+            {/* MOBILE */}
 
             {/* user profile */}
             <div className=" md:hidden block">
@@ -110,7 +109,11 @@ const Header: FC<Props> = ({ activeItem }) => {
                 >
                   <div className="h-[30px] w-[32px] rounded-full border-2 border-primary  mr-1 flex justify-center items-center overflow-hidden">
                     <Image
-                      src={user?.avatar ? user.avatar?.url : avatar}
+                      src={
+                        Object.keys(user?.avatar)?.length >= 1
+                          ? user.avatar?.url
+                          : avatar
+                      }
                       alt="avatar"
                       width={30}
                       height={30}
@@ -151,6 +154,7 @@ const Header: FC<Props> = ({ activeItem }) => {
             </div>
           </div>
 
+          {/* LAPTOP */}
           {/* sign in/up & theme toggler  show only laptop*/}
           <div className=" hidden md:flex items-center ">
             {user ? (
@@ -161,7 +165,11 @@ const Header: FC<Props> = ({ activeItem }) => {
               >
                 <div className="h-[30px] w-[32px] rounded-full border-2 border-primary mr-6 flex justify-center items-center overflow-hidden">
                   <Image
-                    src={user?.avatar ? user.avatar.url : avatar}
+                    src={
+                      Object.keys(user?.avatar)?.length >= 1
+                        ? user.avatar?.url
+                        : avatar
+                    }
                     alt="avatar"
                     width={30}
                     height={30}

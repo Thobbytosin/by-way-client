@@ -1,4 +1,5 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -8,6 +9,7 @@ type Props = {
 
 const CookiesConsent = ({ setShowConsent }: Props) => {
   const [mounted, setMounted] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Trigger the animation on mount
@@ -28,18 +30,13 @@ const CookiesConsent = ({ setShowConsent }: Props) => {
       };
       setShowConsent(false);
     }
+    queryClient.invalidateQueries();
     toast.success("Cookie Preference Saved");
 
     // save to cookie
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 60); // Expire in 60 days
 
-    // dev
-    // document.cookie = `cookie_consent=${JSON.stringify(
-    //   consentData
-    // )}; expires=${expiryDate.toUTCString()}; path=/;`;
-
-    // prod
     document.cookie = `cookie_consent=${JSON.stringify(
       consentData
     )}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax; Secure`;

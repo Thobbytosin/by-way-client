@@ -22,7 +22,6 @@ import { useServerStatus } from "@/hooks/api/useServerStatus";
 import Loader from "../Loader/Loader";
 import ServerErrorUI from "../Home/ServerErrorUI";
 import Header from "../Header";
-import { useLoginMutation } from "@/hooks/api/login.api";
 
 type Props = {};
 
@@ -78,7 +77,7 @@ const Login = (props: Props) => {
       loginUser(formData);
     },
   });
-  const { errors, touched, handleChange, handleSubmit, isSubmitting } = formik;
+  const { errors, touched, handleChange, handleSubmit } = formik;
 
   return (
     <>

@@ -93,22 +93,14 @@ axiosInstance.interceptors.response.use(
           console.log(
             "ORIGINAL REQUEST FAILED SO I AM REFRSHING THE TOKEN AND RECALLING THE FAILED REQUEST AGAIN"
           );
-
           await axiosInstance.get("/refresh-tokens", {
             skipAuthRefresh: true,
           } as CustomAxiosRequestConfig); // refresh
 
-          // await axios.get("/api/auth/refresh-token", {
-          //   withCredentials: true,
-          // });
-
-          // // Retry original request
-          // return axiosInstance(originalRequest);
-
           // set new expiry
           localStorage.setItem(
             "access_token_expiry",
-            (Date.now() + 30 * 60 * 1000).toString()
+            (Date.now() + 59 * 60 * 1000).toString()
           );
 
           return axiosInstance(originalRequest); // resend original request

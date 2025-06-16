@@ -1,9 +1,6 @@
 import { useAuthMutations } from "@/hooks/api/auth.api";
-import { useRouteLoader } from "@/providers/RouteLoadingProvider";
-import axios from "axios";
 import { signOut } from "next-auth/react";
 import React, { FC } from "react";
-import toast from "react-hot-toast";
 
 type Props = {};
 

@@ -8,6 +8,7 @@ import { styles } from "@/styles/style";
 import Ratings from "@/utils/Ratings";
 import { format } from "timeago.js";
 import Image from "next/image";
+import avatar from "@/public/assets/avatar.png";
 
 type Props = {
   reviews: any[];
@@ -16,10 +17,6 @@ type Props = {
 
 const Testimonials: FC<Props> = ({ reviews, fetchUsersData }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  const toggleSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide === 0 ? 1 : 0));
-  };
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
@@ -121,7 +118,11 @@ const Testimonials: FC<Props> = ({ reviews, fetchUsersData }) => {
                       {/* review image */}
                       <div className=" w-8 h-8 rounded-full border-2 border-primary overflow-hidden">
                         <Image
-                          src={fetchUsersData(review.user._id)?.avatar?.url}
+                          src={
+                            review.user
+                              ? fetchUsersData(review.user._id)?.avatar?.url
+                              : avatar
+                          }
                           alt="user_avatar"
                           width={200}
                           height={200}

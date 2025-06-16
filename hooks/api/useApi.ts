@@ -27,26 +27,43 @@ export function useFetchData<T>({
   return useQuery<ApiResponse<T>, ApiError>({
     queryKey: [...queryKey],
     queryFn: async () => {
-      const config = {
-        method,
-        url: `${SERVER_URI}${url}`,
-        withCredentials: true,
-        headers: headers || {},
-        skipAuthRefresh,
-      };
+      try {
+        const config = {
+          method,
+          url: `${SERVER_URI}${url}`,
+          withCredentials: true,
+          headers: headers || {},
+          skipAuthRefresh,
+        };
 
-      const response = await axiosInstance<ApiResponse<T>>(config);
+        const response = await axiosInstance<ApiResponse<T>>(config);
 
-      // check if response structure is correct
-      if (!response.data || typeof response.data.success !== "boolean") {
+        // validate response shape
+        if (!response.data || typeof response.data.success !== "boolean") {
+          throw {
+            success: false,
+            message: "Invalid API response structure",
+            statusCode: 500,
+          } satisfies ApiError;
+        }
+
+        return response.data;
+      } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response?.data) {
+          const data = error.response.data;
+          throw {
+            success: false,
+            message: data.message || "Unknown error",
+            statusCode: data.statusCode || error.response.status,
+          } satisfies ApiError;
+        }
+
         throw {
           success: false,
-          message: "Invalid API response structure",
+          message: error.message || "Unexpected error",
           statusCode: 500,
         } satisfies ApiError;
       }
-
-      return response.data;
     },
     staleTime,
     enabled,
