@@ -37,7 +37,7 @@ const Home = () => {
   const { coursesLoading } = coursesFreeDomain;
   const { usersDomainData } = useUserQueries({ type: "user-lists" });
   const { usersList } = usersDomainData;
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
   const [showConsent, setShowConsent] = useState(false);
@@ -86,11 +86,9 @@ const Home = () => {
   return (
     <>
       <div className={styles.pageMinSize}>
-        {!heroLoading && !categoriesLoading && !coursesLoading && <Header />}
+        <Header />
 
-        {serverLoading ? (
-          <Loader key={"loading"} />
-        ) : serverError ? (
+        {serverError ? (
           <ServerErrorUI errorMessage={serverError} />
         ) : (
           <>

@@ -40,7 +40,7 @@ export const useServerStatus = (options?: { checkInterval?: number }) => {
       setIsOnline(true);
 
       // Stop checking after 3 consecutive successes
-      if (consecutiveChecksRef.current >= 3 && intervalRef.current) {
+      if (consecutiveChecksRef.current >= 2 && intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = undefined;
       }
