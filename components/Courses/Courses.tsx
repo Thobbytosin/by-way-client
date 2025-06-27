@@ -31,7 +31,7 @@ const Courses = () => {
   const { categories } = contentDomainData;
   const { coursesFreeDomain } = useCourseQueries({ type: "free-list" });
   const { coursesLoading } = coursesFreeDomain;
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
 
@@ -110,9 +110,7 @@ const Courses = () => {
       <div className={styles.pageMinSize}>
         <Header activeItem={0} />
 
-        {serverLoading ? (
-          <Loader key={"loading"} />
-        ) : serverError ? (
+        {serverError ? (
           <ServerErrorUI errorMessage={serverError} />
         ) : (
           <>

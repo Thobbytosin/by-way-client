@@ -14,11 +14,11 @@ type Props = {};
 
 const ProfilePage = (props: Props) => {
   const { user, loading, allowedToRender } = useProtectedRoute({});
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
 
-  if (loading || !allowedToRender || serverLoading) {
+  if (loading || !allowedToRender) {
     return <Loader key="loading" />;
   }
 

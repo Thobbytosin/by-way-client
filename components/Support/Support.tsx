@@ -19,7 +19,7 @@ const Support = (props: Props) => {
     faq: true,
   });
   const [activeQuestionId, setActiveQuestionId] = useState<number | null>(null);
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
 
@@ -37,9 +37,7 @@ const Support = (props: Props) => {
       <div className={styles.pageMinSize}>
         <Header activeItem={1} />
 
-        {serverLoading ? (
-          <Loader key={"loading"} />
-        ) : serverError ? (
+        {serverError ? (
           <ServerErrorUI errorMessage={serverError} />
         ) : (
           <>

@@ -32,7 +32,7 @@ const Page = ({ params }: any) => {
     type: "course-content",
   });
   const { courseData, courseDataLoading } = courseContentDomain;
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
   const [groupedSections, setGroupedSections] = useState<SectionGroup[]>([]);
@@ -97,7 +97,7 @@ const Page = ({ params }: any) => {
     <>
       <Header activeItem={0} />
 
-      {serverLoading || courseDataLoading ? (
+      {courseDataLoading ? (
         <Loader key={"loading"} />
       ) : serverError ? (
         <ServerErrorUI errorMessage={serverError} />

@@ -54,7 +54,7 @@ const Register = () => {
     registerDomain;
   const user = useSelector((state: RootState) => state.auth.user);
   const { data: nextAuthData } = useSession();
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
 
@@ -112,9 +112,7 @@ const Register = () => {
     <>
       <Header />
 
-      {serverLoading ? (
-        <Loader key={"loading"} />
-      ) : serverError ? (
+      {serverError ? (
         <ServerErrorUI errorMessage={serverError} />
       ) : (
         <>

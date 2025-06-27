@@ -46,7 +46,7 @@ const Login = (props: Props) => {
   // const { mutate: loginUser, isPending: loginUserLoading } = useLoginMutation();
   const { loginDomain, socialLoginUser } = useAuthMutations();
   const { loginUser, loginUserLoading } = loginDomain;
-  const { error: serverError, isLoading: serverLoading } = useServerStatus({
+  const { error: serverError } = useServerStatus({
     checkInterval: 10000,
   });
 
@@ -83,9 +83,7 @@ const Login = (props: Props) => {
     <>
       <div className={styles.pageMinSize}>
         <Header />
-        {serverLoading ? (
-          <Loader key={"loading"} />
-        ) : serverError ? (
+        {serverError ? (
           <ServerErrorUI errorMessage={serverError} />
         ) : (
           <>
