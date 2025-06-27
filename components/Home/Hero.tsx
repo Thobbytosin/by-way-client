@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React, { FC } from "react";
+import SectionLoader from "../Loader/SectionLoader";
 
 type Props = {
   hero:
@@ -15,7 +16,7 @@ type Props = {
 };
 
 const Hero: FC<Props> = ({ hero }) => {
-  if (!hero) return null;
+  if (!hero) return <SectionLoader />;
 
   return (
     <div className=" w-screen xl:h-screen p-10 flex xl:flex-row flex-col xl:justify-between lg:items-center ">

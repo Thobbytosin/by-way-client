@@ -1,5 +1,6 @@
 import { styles } from "@/styles/style";
 import React, { FC } from "react";
+import SectionLoader from "../Loader/SectionLoader";
 
 type Props = {
   coursesLength: number;
@@ -7,7 +8,7 @@ type Props = {
 };
 
 const SuccessCount: FC<Props> = ({ coursesLength, usersLength }) => {
-  if (!usersLength) return;
+  if (!usersLength) return <SectionLoader />;
   return (
     <div
       className={`${styles.paddingX} ${styles.paddingY}  w-full bg-white dark:bg-slate-900 flex sm:flex-row flex-col  items-center justify-center sm:mt-0 sm:mb-0 mt-20 sm:gap-0 gap-10`}

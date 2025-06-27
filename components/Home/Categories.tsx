@@ -2,6 +2,7 @@ import { styles } from "@/styles/style";
 import React, { FC } from "react";
 import Loader from "../Loader/Loader";
 import CategoriesCard from "../Categories/CategoriesCard";
+import SectionLoader from "../Loader/SectionLoader";
 
 type Props = {
   isLoading: boolean | undefined;
@@ -10,6 +11,8 @@ type Props = {
 };
 
 const Categories: FC<Props> = ({ isLoading, data, coursesData }) => {
+  if (!data || !coursesData) return <SectionLoader />;
+
   return (
     <div className={`${styles.paddingX} ${styles.paddingY}`}>
       <div className=" w-full flex items-center xl:justify-between justify-center">

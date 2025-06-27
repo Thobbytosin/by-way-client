@@ -1,12 +1,14 @@
 import { styles } from "@/styles/style";
 import React, { FC } from "react";
 import CourseCard from "../Course/CourseCard";
+import SectionLoader from "../Loader/SectionLoader";
 
 type Props = {
   courses: any[];
 };
 
 const CoursesCategory: FC<Props> = ({ courses }) => {
+  if (!courses || courses.length === 0) return <SectionLoader />;
   return (
     <div
       className={`w-full  dark:bg-black bg-gray-200 ${styles.paddingX} ${styles.paddingY}`}
